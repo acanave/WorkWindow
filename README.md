@@ -64,15 +64,16 @@ Rules:
 - Selected-day agenda strip with block editing
 - Card progress controls (`+1` / `-1` completed points)
 - Due-date risk warnings (overdue or planned-point shortfall) on cards and agenda
-- Dependency warning badge on cards
+- Dependency warning badges with chain/cycle highlights on cards
+- Dependency graph panel with blocker/dependent chain visibility
+- “Blocked by” section in card modal for unresolved dependencies
 - localStorage persistence with schema normalization
 - Export JSON / Import JSON
 
 ## Known limitations
 
-- No automated test suite yet (manual verification only)
+- Automated tests cover core flows but are not exhaustive yet
 - Uses basic HTML5 drag/drop (no advanced touch DnD handling)
-- No filtering/search/sorting for large boards
 - Calendar is month-only in v1
 - No automatic scheduling suggestions when risk is detected
 

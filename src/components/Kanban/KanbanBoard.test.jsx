@@ -19,11 +19,13 @@ function makeCard(overrides = {}) {
   }
 }
 
-function renderBoard(cards, riskByCardId = {}) {
+function renderBoard(cards, riskByCardId = {}, chainDepthByCardId = {}, hasCycleByCardId = {}) {
   return render(
     <KanbanBoard
       cards={cards}
       unresolvedMap={{}}
+      chainDepthByCardId={chainDepthByCardId}
+      hasCycleByCardId={hasCycleByCardId}
       riskByCardId={riskByCardId}
       onCreateCard={noop}
       onOpenCard={noop}
@@ -82,5 +84,17 @@ describe('KanbanBoard', () => {
     )
 
     expect(screen.getByText('Short 2pt')).toBeInTheDocument()
+  })
+
+  it('shows chain depth and cycle badges', () => {
+    renderBoard(
+      [makeCard({ id: 'c1', title: 'Chained task' }), makeCard({ id: 'c2', title: 'Cycle task' })],
+      {},
+      { c1: 3, c2: 2 },
+      { c2: true },
+    )
+
+    expect(screen.getByText('Chain 3 deep')).toBeInTheDocument()
+    expect(screen.getByText('Cycle')).toBeInTheDocument()
   })
 })

@@ -1,4 +1,12 @@
-export default function TaskCard({ card, risk, unresolvedDependencyCount, onOpen, onLogProgress }) {
+export default function TaskCard({
+  card,
+  risk,
+  unresolvedDependencyCount,
+  chainDepth,
+  hasDependencyCycle,
+  onOpen,
+  onLogProgress,
+}) {
   const completion = Math.round((card.completed_points / card.estimate_points) * 100)
   const totalPlanned = card.planned_day_blocks.reduce((sum, block) => sum + block.points, 0)
 
@@ -32,6 +40,14 @@ export default function TaskCard({ card, risk, unresolvedDependencyCount, onOpen
           {unresolvedDependencyCount > 0 && (
             <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
               Depends on {unresolvedDependencyCount}
+            </span>
+          )}
+          {hasDependencyCycle && (
+            <span className="rounded bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800">Cycle</span>
+          )}
+          {!hasDependencyCycle && chainDepth > 1 && (
+            <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+              Chain {chainDepth} deep
             </span>
           )}
         </div>

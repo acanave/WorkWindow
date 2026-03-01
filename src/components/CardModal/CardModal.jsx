@@ -5,6 +5,7 @@ export default function CardModal({
   mode,
   card,
   allCards,
+  blockedBy = [],
   onClose,
   onCreate,
   onUpdate,
@@ -32,6 +33,9 @@ export default function CardModal({
   }, [card])
 
   const dependencyOptions = allCards.filter((item) => item.id !== card?.id)
+  const unresolvedSelectedDependencies = dependencyOptions.filter(
+    (dep) => dependencies.includes(dep.id) && dep.status !== 'Done',
+  )
 
   const handleDependencyToggle = (depId) => {
     setDependencies((prev) => (prev.includes(depId) ? prev.filter((id) => id !== depId) : [...prev, depId]))
@@ -147,6 +151,26 @@ export default function CardModal({
               ))}
             </div>
           </fieldset>
+
+          {(mode === 'edit' || unresolvedSelectedDependencies.length > 0) && (
+            <section className="rounded border border-amber-200 bg-amber-50 p-2">
+              <h3 className="mb-1 text-sm font-semibold text-amber-900">Blocked by</h3>
+              {unresolvedSelectedDependencies.length === 0 && blockedBy.length === 0 ? (
+                <p className="text-xs text-amber-800">No unresolved dependencies.</p>
+              ) : (
+                <ul className="space-y-1">
+                  {(unresolvedSelectedDependencies.length > 0
+                    ? unresolvedSelectedDependencies
+                    : blockedBy
+                  ).map((dep) => (
+                    <li key={dep.id} className="text-xs text-amber-900">
+                      {dep.title} ({dep.status})
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
 
           {card && (
             <div className="rounded border border-slate-200 bg-slate-50 p-2">
