@@ -63,6 +63,7 @@ Rules:
 - Edit/delete day block chips (points 1-8)
 - Selected-day agenda strip with block editing
 - Card progress controls (`+1` / `-1` completed points)
+- Due-date risk warnings (overdue or planned-point shortfall) on cards and agenda
 - Dependency warning badge on cards
 - localStorage persistence with schema normalization
 - Export JSON / Import JSON
@@ -73,7 +74,7 @@ Rules:
 - Uses basic HTML5 drag/drop (no advanced touch DnD handling)
 - No filtering/search/sorting for large boards
 - Calendar is month-only in v1
-- No conflict detection between due date and remaining work
+- No automatic scheduling suggestions when risk is detected
 
 ## V2 backlog
 

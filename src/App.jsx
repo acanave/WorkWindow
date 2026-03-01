@@ -5,6 +5,7 @@ import KanbanBoard from './components/Kanban/KanbanBoard'
 import CardModal from './components/CardModal/CardModal'
 import { parseImportedJson, downloadStateAsJson } from './state/persistence'
 import { StoreProvider, useStore } from './state/store'
+import { buildRiskByCardId } from './utils/risk'
 
 function WorkWindowApp() {
   const { state, dispatch } = useStore()
@@ -34,6 +35,8 @@ function WorkWindowApp() {
 
     return byId
   }, [state.cards])
+
+  const riskByCardId = useMemo(() => buildRiskByCardId(state.cards), [state.cards])
 
   const selectedCard = state.cards.find((card) => card.id === modal.cardId) || null
 
@@ -93,6 +96,7 @@ function WorkWindowApp() {
           <KanbanBoard
             cards={state.cards}
             unresolvedMap={unresolvedMap}
+            riskByCardId={riskByCardId}
             onCreateCard={createCard}
             onOpenCard={openEdit}
             onMoveCard={moveCard}
@@ -103,6 +107,7 @@ function WorkWindowApp() {
         <section>
           <MonthCalendar
             cards={state.cards}
+            riskByCardId={riskByCardId}
             selectedDate={state.ui.selectedDate}
             onSelectDate={setSelectedDate}
             onDropCard={addDayBlock}

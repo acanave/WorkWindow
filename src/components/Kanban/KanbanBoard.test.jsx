@@ -19,11 +19,12 @@ function makeCard(overrides = {}) {
   }
 }
 
-function renderBoard(cards) {
+function renderBoard(cards, riskByCardId = {}) {
   return render(
     <KanbanBoard
       cards={cards}
       unresolvedMap={{}}
+      riskByCardId={riskByCardId}
       onCreateCard={noop}
       onOpenCard={noop}
       onMoveCard={noop}
@@ -64,5 +65,22 @@ describe('KanbanBoard', () => {
     const titles = within(backlogSection).getAllByRole('heading', { level: 4 }).map((node) => node.textContent)
 
     expect(titles).toEqual(['Due sooner', 'Due later', 'No due'])
+  })
+
+  it('shows risk badge for cards with due-date shortfall', () => {
+    renderBoard(
+      [makeCard({ id: 'c1', title: 'At risk task' })],
+      {
+        c1: {
+          kind: 'at_risk',
+          dueDate: '2026-03-10',
+          remainingPoints: 4,
+          plannedBeforeDue: 2,
+          shortfall: 2,
+        },
+      },
+    )
+
+    expect(screen.getByText('Short 2pt')).toBeInTheDocument()
   })
 })

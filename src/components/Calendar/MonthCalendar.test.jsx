@@ -7,6 +7,7 @@ import { monthLabel, parseDateKey } from '../../utils/date'
 function makeProps(selectedDate) {
   return {
     cards: [],
+    riskByCardId: {},
     selectedDate,
     onSelectDate: vi.fn(),
     onDropCard: vi.fn(),
@@ -56,6 +57,7 @@ describe('MonthCalendar', () => {
             completed_points: 4,
           },
         ]}
+        riskByCardId={{}}
         selectedDate="2026-03-10"
         onSelectDate={vi.fn()}
         onDropCard={vi.fn()}
@@ -71,5 +73,41 @@ describe('MonthCalendar', () => {
 
     expect(screen.getAllByRole('button', { name: /task backlog • 1pt/i }).length).toBeGreaterThan(0)
     expect(screen.queryByRole('button', { name: /task done • 1pt/i })).not.toBeInTheDocument()
+  })
+
+  it('shows due-date warning badge in agenda for risky cards', () => {
+    render(
+      <MonthCalendar
+        cards={[
+          {
+            id: 'c1',
+            title: 'Risk task',
+            description: '',
+            status: 'In Progress',
+            estimate_points: 4,
+            due_date: '2026-03-10',
+            dependencies: [],
+            planned_day_blocks: [{ id: 'b1', date: '2026-03-10', points: 1 }],
+            completed_points: 0,
+          },
+        ]}
+        riskByCardId={{
+          c1: {
+            kind: 'at_risk',
+            dueDate: '2026-03-10',
+            remainingPoints: 4,
+            plannedBeforeDue: 1,
+            shortfall: 3,
+          },
+        }}
+        selectedDate="2026-03-10"
+        onSelectDate={vi.fn()}
+        onDropCard={vi.fn()}
+        onUpdateBlock={vi.fn()}
+        onDeleteBlock={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Short 3pt')).toBeInTheDocument()
   })
 })
