@@ -1,8 +1,9 @@
 import { createId } from '../utils/id'
 import { formatDateKey } from '../utils/date'
 
-export const SCHEMA_VERSION = 1
-export const STORAGE_KEY = 'workwindow:data:v1'
+export const SCHEMA_VERSION = 2
+export const STORAGE_KEY = 'workwindow:data:v2'
+export const LEGACY_STORAGE_KEYS = ['workwindow:data:v1']
 
 export const STATUSES = ['Backlog', 'In Progress', 'Blocked', 'Done']
 
@@ -22,6 +23,7 @@ export function createDefaultCard(input = {}) {
     dependencies: Array.isArray(input.dependencies) ? input.dependencies.filter(Boolean) : [],
     planned_day_blocks: normalizeBlocks(input.planned_day_blocks),
     completed_points: completed,
+    progress_log: normalizeProgressLog(input.progress_log),
   }
 }
 
@@ -37,13 +39,14 @@ export function createInitialState() {
 
 export function normalizeState(raw) {
   if (!raw || typeof raw !== 'object') return createInitialState()
+  const migrated = migrateToLatest(raw)
 
   const state = {
     version: SCHEMA_VERSION,
     ui: {
-      selectedDate: normalizeDateOrToday(raw.ui?.selectedDate),
+      selectedDate: normalizeDateOrToday(migrated.ui?.selectedDate),
     },
-    cards: Array.isArray(raw.cards) ? raw.cards.map(createDefaultCard) : [],
+    cards: Array.isArray(migrated.cards) ? migrated.cards.map(createDefaultCard) : [],
   }
 
   const cardIdSet = new Set(state.cards.map((card) => card.id))
@@ -64,12 +67,30 @@ export function normalizeState(raw) {
 }
 
 export function parseImportPayload(text) {
-  const parsed = JSON.parse(text)
-  if (parsed?.version !== SCHEMA_VERSION) {
+  let parsed
+  try {
+    parsed = JSON.parse(text)
+  } catch {
+    throw new Error('Invalid JSON payload')
+  }
+
+  assertImportPayload(parsed)
+
+  return normalizeState(parsed)
+}
+
+export function migrateToLatest(raw) {
+  const version = Number.isInteger(raw?.version) ? raw.version : 1
+
+  if (version > SCHEMA_VERSION) {
     throw new Error('Unsupported schema version')
   }
-  const normalized = normalizeState(parsed)
-  return normalized
+
+  if (version <= 1) {
+    return migrateV1ToV2(raw)
+  }
+
+  return raw
 }
 
 function normalizeBlocks(blocks) {
@@ -82,6 +103,16 @@ function normalizeBlocks(blocks) {
       points: normalizeInt(block?.points, 1, 1, 8),
     }))
     .filter(Boolean)
+}
+
+function normalizeProgressLog(log) {
+  if (!Array.isArray(log)) return []
+
+  return log.map((entry) => ({
+    id: entry?.id || createId('p'),
+    date: normalizeDateOrToday(entry?.date),
+    delta: normalizeInt(entry?.delta, 0, -999, 999),
+  }))
 }
 
 function normalizeDateOrNull(value) {
@@ -102,4 +133,45 @@ function normalizeInt(value, fallback, min, max) {
   const n = Number.parseInt(value, 10)
   if (Number.isNaN(n)) return fallback
   return Math.min(max, Math.max(min, n))
+}
+
+function migrateV1ToV2(raw) {
+  const cards = Array.isArray(raw?.cards) ? raw.cards : []
+
+  return {
+    ...raw,
+    version: 2,
+    cards: cards.map((card) => ({
+      ...card,
+      progress_log: Array.isArray(card?.progress_log) ? card.progress_log : [],
+    })),
+  }
+}
+
+function assertImportPayload(parsed) {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Import payload must be an object')
+  }
+
+  const version = Number.isInteger(parsed.version) ? parsed.version : 1
+
+  if (version > SCHEMA_VERSION || version < 1) {
+    throw new Error('Unsupported schema version')
+  }
+
+  if (!Array.isArray(parsed.cards)) {
+    throw new Error('Import payload cards must be an array')
+  }
+
+  if (parsed.cards.length > 5000) {
+    throw new Error('Import payload has too many cards')
+  }
+
+  const explicitIds = parsed.cards
+    .map((card) => card?.id)
+    .filter((id) => typeof id === 'string' && id.length > 0)
+  const idSet = new Set(explicitIds)
+  if (idSet.size !== explicitIds.length) {
+    throw new Error('Import payload has duplicate card IDs')
+  }
 }

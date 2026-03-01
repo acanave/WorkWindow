@@ -18,11 +18,11 @@ npm run preview
 
 ## Data model
 
-State is stored in localStorage with key `workwindow:data:v1`.
+State is stored in localStorage with key `workwindow:data:v2` (auto-migrated from `v1`).
 
 ```js
 {
-  version: 1,
+  version: 2,
   ui: {
     selectedDate: "YYYY-MM-DD"
   },
@@ -38,7 +38,10 @@ State is stored in localStorage with key `workwindow:data:v1`.
       planned_day_blocks: [
         { id, date: "YYYY-MM-DD", points: 1 }
       ],
-      completed_points
+      completed_points,
+      progress_log: [
+        { id, date: "YYYY-MM-DD", delta: 1 }
+      ]
     }
   ]
 }
@@ -49,6 +52,7 @@ Rules:
 - `completion = completed_points / estimate_points`
 - if `completed_points >= estimate_points`, card auto moves to `Done`
 - dependencies are warning-only (not scheduling blockers)
+- progress updates are tracked in `progress_log` for velocity metrics
 - import replaces all app data
 
 ## Implemented V1 features
@@ -67,6 +71,8 @@ Rules:
 - Dependency warning badges with chain/cycle highlights on cards
 - Dependency graph panel with blocker/dependent chain visibility
 - “Blocked by” section in card modal for unresolved dependencies
+- Performance panel with burnup, plan coverage, weekly velocity, and 7-day forecast
+- Schema v1 -> v2 migration scaffolding and stricter import validation
 - localStorage persistence with schema normalization
 - Export JSON / Import JSON
 

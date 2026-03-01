@@ -3,7 +3,7 @@ import { reducer } from './store'
 
 function makeState(cardOverrides = {}) {
   return {
-    version: 1,
+    version: 2,
     ui: { selectedDate: '2026-03-01' },
     cards: [
       {
@@ -16,6 +16,7 @@ function makeState(cardOverrides = {}) {
         dependencies: [],
         planned_day_blocks: [],
         completed_points: 0,
+        progress_log: [],
         ...cardOverrides,
       },
     ],
@@ -52,6 +53,8 @@ describe('store reducer', () => {
 
     expect(next.cards[0].completed_points).toBe(3)
     expect(next.cards[0].status).toBe('In Progress')
+    expect(next.cards[0].progress_log).toHaveLength(1)
+    expect(next.cards[0].progress_log[0].delta).toBe(-1)
   })
 
   it('adds, updates, and deletes day blocks', () => {
