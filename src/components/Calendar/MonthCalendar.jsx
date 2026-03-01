@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { addMonths, formatDateKey, getMonthGrid, monthLabel, parseDateKey } from '../../utils/date'
 import DayCell from './DayCell'
 import AgendaStrip from './AgendaStrip'
@@ -12,6 +12,10 @@ export default function MonthCalendar({
   onDeleteBlock,
 }) {
   const [cursor, setCursor] = useState(parseDateKey(selectedDate))
+
+  useEffect(() => {
+    setCursor(parseDateKey(selectedDate))
+  }, [selectedDate])
 
   const monthDays = useMemo(() => getMonthGrid(cursor), [cursor])
 

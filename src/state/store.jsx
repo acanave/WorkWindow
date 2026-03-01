@@ -30,7 +30,11 @@ function reducer(state, action) {
       const { id, status } = action.payload
       return {
         ...state,
-        cards: state.cards.map((card) => (card.id === id ? { ...card, status } : card)),
+        cards: state.cards.map((card) => {
+          if (card.id !== id) return card
+          if (status === 'Done' && card.completed_points < card.estimate_points) return card
+          return { ...card, status }
+        }),
       }
     }
     case 'DAY_BLOCK_ADD': {
@@ -84,7 +88,7 @@ function reducer(state, action) {
         cards: state.cards.map((card) => {
           if (card.id !== id) return card
           const completed = clamp(card.completed_points + delta, 0, card.estimate_points)
-          const status = completed >= card.estimate_points ? 'Done' : card.status
+          const status = completed >= card.estimate_points ? 'Done' : card.status === 'Done' ? 'In Progress' : card.status
           return {
             ...card,
             completed_points: completed,
@@ -111,8 +115,7 @@ function reducer(state, action) {
 }
 
 export function StoreProvider({ children }) {
-  const persisted = loadState()
-  const [state, dispatch] = useReducer(reducer, persisted || createInitialState())
+  const [state, dispatch] = useReducer(reducer, undefined, initializeState)
 
   useEffect(() => {
     saveState(state)
@@ -135,4 +138,8 @@ function clamp(value, min, max) {
 
 function clampPoints(points) {
   return clamp(Number.parseInt(points, 10) || 1, 1, 8)
+}
+
+function initializeState() {
+  return loadState() || createInitialState()
 }

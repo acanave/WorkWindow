@@ -7,16 +7,21 @@ export const STORAGE_KEY = 'workwindow:data:v1'
 export const STATUSES = ['Backlog', 'In Progress', 'Blocked', 'Done']
 
 export function createDefaultCard(input = {}) {
+  const estimate = normalizeInt(input.estimate_points, 4, 1, 999)
+  const completed = normalizeInt(input.completed_points, 0, 0, 999)
+  const requestedStatus = STATUSES.includes(input.status) ? input.status : 'Backlog'
+  const status = completed >= estimate ? 'Done' : requestedStatus === 'Done' ? 'In Progress' : requestedStatus
+
   return {
     id: input.id || createId('c'),
     title: input.title || 'Untitled task',
     description: input.description || '',
-    status: STATUSES.includes(input.status) ? input.status : 'Backlog',
-    estimate_points: normalizeInt(input.estimate_points, 4, 1, 999),
+    status,
+    estimate_points: estimate,
     due_date: normalizeDateOrNull(input.due_date),
     dependencies: Array.isArray(input.dependencies) ? input.dependencies.filter(Boolean) : [],
     planned_day_blocks: normalizeBlocks(input.planned_day_blocks),
-    completed_points: normalizeInt(input.completed_points, 0, 0, 999),
+    completed_points: completed,
   }
 }
 
@@ -51,7 +56,7 @@ export function normalizeState(raw) {
       ...card,
       dependencies,
       completed_points: completed,
-      status: completed >= card.estimate_points ? 'Done' : card.status,
+      status: completed >= card.estimate_points ? 'Done' : card.status === 'Done' ? 'In Progress' : card.status,
     }
   })
 
