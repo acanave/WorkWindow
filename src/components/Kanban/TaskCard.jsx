@@ -1,4 +1,4 @@
-export default function TaskCard({ card, unresolvedDependencyCount, onOpen, onLogProgress }) {
+export default function TaskCard({ card, risk, unresolvedDependencyCount, onOpen, onLogProgress }) {
   const completion = Math.round((card.completed_points / card.estimate_points) * 100)
   const totalPlanned = card.planned_day_blocks.reduce((sum, block) => sum + block.points, 0)
 
@@ -16,11 +16,25 @@ export default function TaskCard({ card, unresolvedDependencyCount, onOpen, onLo
     >
       <div className="mb-2 flex items-start justify-between gap-2">
         <h4 className="text-sm font-semibold text-slate-900">{card.title}</h4>
-        {unresolvedDependencyCount > 0 && (
-          <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-            Depends on {unresolvedDependencyCount}
-          </span>
-        )}
+        <div className="flex flex-col items-end gap-1">
+          {risk && (
+            <span
+              className={`rounded px-2 py-0.5 text-xs font-medium ${
+                risk.kind === 'overdue'
+                  ? 'bg-rose-100 text-rose-800'
+                  : 'bg-orange-100 text-orange-800'
+              }`}
+              title={`Due ${risk.dueDate} • ${risk.remainingPoints} pts left • ${risk.plannedBeforeDue} pts planned`}
+            >
+              {risk.kind === 'overdue' ? 'Overdue' : `Short ${risk.shortfall}pt`}
+            </span>
+          )}
+          {unresolvedDependencyCount > 0 && (
+            <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+              Depends on {unresolvedDependencyCount}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="space-y-1 text-xs text-slate-600">

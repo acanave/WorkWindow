@@ -6,6 +6,7 @@ import AgendaStrip from './AgendaStrip'
 
 export default function MonthCalendar({
   cards,
+  riskByCardId = {},
   selectedDate,
   onSelectDate,
   onDropCard,
@@ -133,6 +134,7 @@ export default function MonthCalendar({
         selectedDate={selectedDate}
         blocks={selectedBlocks}
         cardTitleById={cardTitleById}
+        riskByCardId={riskByCardId}
         onUpdateBlock={onUpdateBlock}
         onDeleteBlock={onDeleteBlock}
       />

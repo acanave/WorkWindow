@@ -4,6 +4,7 @@ export default function KanbanColumn({
   status,
   cards,
   unresolvedMap,
+  riskByCardId,
   onOpenCard,
   onMoveCard,
   onLogProgress,
@@ -32,6 +33,7 @@ export default function KanbanColumn({
             key={card.id}
             card={card}
             unresolvedDependencyCount={unresolvedMap[card.id] || 0}
+            risk={riskByCardId[card.id] || null}
             onOpen={() => onOpenCard(card.id)}
             onLogProgress={onLogProgress}
           />
