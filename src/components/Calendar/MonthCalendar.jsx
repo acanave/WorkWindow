@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { STATUSES } from '../../state/schema'
 import { addMonths, formatDateKey, getMonthGrid, monthLabel, parseDateKey } from '../../utils/date'
 import DayCell from './DayCell'
 import AgendaStrip from './AgendaStrip'
@@ -12,10 +13,23 @@ export default function MonthCalendar({
   onDeleteBlock,
 }) {
   const [cursor, setCursor] = useState(parseDateKey(selectedDate))
+  const [visibleStatuses, setVisibleStatuses] = useState(STATUSES)
 
   useEffect(() => {
     setCursor(parseDateKey(selectedDate))
   }, [selectedDate])
+
+  const toggleStatus = (status) => {
+    setVisibleStatuses((current) => {
+      if (current.includes(status)) {
+        if (current.length === 1) return current
+        return current.filter((value) => value !== status)
+      }
+      const next = new Set(current)
+      next.add(status)
+      return STATUSES.filter((value) => next.has(value))
+    })
+  }
 
   const monthDays = useMemo(() => getMonthGrid(cursor), [cursor])
 
@@ -24,6 +38,7 @@ export default function MonthCalendar({
     const titleById = {}
 
     cards.forEach((card) => {
+      if (!visibleStatuses.includes(card.status)) return
       titleById[card.id] = card.title
       card.planned_day_blocks.forEach((block) => {
         if (!byDate[block.date]) byDate[block.date] = []
@@ -32,7 +47,7 @@ export default function MonthCalendar({
     })
 
     return { blocksByDate: byDate, cardTitleById: titleById }
-  }, [cards])
+  }, [cards, visibleStatuses])
 
   const selectedBlocks = blocksByDate[selectedDate] || []
 
@@ -66,6 +81,26 @@ export default function MonthCalendar({
           </button>
         </div>
         <h2 className="text-sm font-semibold text-slate-800">{monthLabel(cursor)}</h2>
+      </div>
+      <div className="mb-3 rounded-lg border border-slate-200 bg-white p-2">
+        <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Calendar filters</div>
+        <div className="flex flex-wrap gap-1">
+          {STATUSES.map((status) => {
+            const active = visibleStatuses.includes(status)
+            return (
+              <button
+                key={status}
+                type="button"
+                onClick={() => toggleStatus(status)}
+                className={`rounded border px-2 py-1 text-xs ${
+                  active ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-300 bg-white text-slate-700'
+                }`}
+              >
+                {status}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       <div className="mb-2 grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-500">
