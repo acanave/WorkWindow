@@ -5,7 +5,7 @@ import { loadState, saveState } from './persistence'
 
 const StoreContext = createContext(null)
 
-function reducer(state, action) {
+export function reducer(state, action) {
   switch (action.type) {
     case 'CARD_CREATE': {
       const nextCard = createDefaultCard({ ...action.payload, id: createId('c') })
