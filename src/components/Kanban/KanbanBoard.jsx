@@ -6,6 +6,8 @@ import KanbanColumn from './KanbanColumn'
 export default function KanbanBoard({
   cards,
   unresolvedMap,
+  chainDepthByCardId = {},
+  hasCycleByCardId = {},
   riskByCardId = {},
   onCreateCard,
   onOpenCard,
@@ -94,6 +96,8 @@ export default function KanbanBoard({
             status={status}
             cards={sortedCards.filter((card) => card.status === status)}
             unresolvedMap={unresolvedMap}
+            chainDepthByCardId={chainDepthByCardId}
+            hasCycleByCardId={hasCycleByCardId}
             riskByCardId={riskByCardId}
             onOpenCard={onOpenCard}
             onMoveCard={onMoveCard}

@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import AppHeader from './components/AppHeader'
 import MonthCalendar from './components/Calendar/MonthCalendar'
 import KanbanBoard from './components/Kanban/KanbanBoard'
+import DependencyPanel from './components/Kanban/DependencyPanel'
 import CardModal from './components/CardModal/CardModal'
 import { parseImportedJson, downloadStateAsJson } from './state/persistence'
 import { StoreProvider, useStore } from './state/store'
+import { buildDependencyInsights } from './utils/dependencies'
 import { buildRiskByCardId } from './utils/risk'
 
 function WorkWindowApp() {
@@ -21,20 +23,8 @@ function WorkWindowApp() {
     window.localStorage.setItem('workwindow:theme', theme)
   }, [theme])
 
-  const unresolvedMap = useMemo(() => {
-    const byId = {}
-    const cardById = Object.fromEntries(state.cards.map((card) => [card.id, card]))
-
-    state.cards.forEach((card) => {
-      const unresolved = card.dependencies.filter((depId) => {
-        const dep = cardById[depId]
-        return dep && dep.status !== 'Done'
-      })
-      byId[card.id] = unresolved.length
-    })
-
-    return byId
-  }, [state.cards])
+  const dependencyInsights = useMemo(() => buildDependencyInsights(state.cards), [state.cards])
+  const unresolvedMap = dependencyInsights.unresolvedCountByCardId
 
   const riskByCardId = useMemo(() => buildRiskByCardId(state.cards), [state.cards])
 
@@ -92,16 +82,19 @@ function WorkWindowApp() {
       />
 
       <main className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-4 xl:grid-cols-[1.1fr_1fr]">
-        <section>
+        <section className="space-y-4">
           <KanbanBoard
             cards={state.cards}
             unresolvedMap={unresolvedMap}
+            chainDepthByCardId={dependencyInsights.chainDepthByCardId}
+            hasCycleByCardId={dependencyInsights.hasCycleByCardId}
             riskByCardId={riskByCardId}
             onCreateCard={createCard}
             onOpenCard={openEdit}
             onMoveCard={moveCard}
             onLogProgress={logProgress}
           />
+          <DependencyPanel cards={state.cards} dependencyInsights={dependencyInsights} onOpenCard={openEdit} />
         </section>
 
         <section>
@@ -122,6 +115,7 @@ function WorkWindowApp() {
           mode={modal.mode}
           card={selectedCard}
           allCards={state.cards}
+          blockedBy={selectedCard ? dependencyInsights.blockedByByCardId[selectedCard.id] || [] : []}
           onClose={closeModal}
           onCreate={createCard}
           onUpdate={updateCard}
