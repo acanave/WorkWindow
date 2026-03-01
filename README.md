@@ -54,9 +54,11 @@ Rules:
 ## Implemented V1 features
 
 - Kanban board with 4 columns: Backlog, In Progress, Blocked, Done
+- Board search, status filters, and sorting (created order, due date, progress)
 - Create, edit, delete cards
 - Drag card between columns (status update)
 - Month calendar grid with day chips for planned blocks
+- Calendar status filters for visible planned day blocks
 - Drag card from board to day cell to create a 1-point block
 - Edit/delete day block chips (points 1-8)
 - Selected-day agenda strip with block editing
