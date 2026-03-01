@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function DayChip({ block, cardTitle, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false)
   const [points, setPoints] = useState(block.points)
+
+  useEffect(() => {
+    setPoints(block.points)
+  }, [block.id, block.points])
 
   const save = () => {
     onUpdate(block.cardId, block.id, points)
