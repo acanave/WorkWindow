@@ -3,10 +3,12 @@ import AppHeader from './components/AppHeader'
 import MonthCalendar from './components/Calendar/MonthCalendar'
 import KanbanBoard from './components/Kanban/KanbanBoard'
 import DependencyPanel from './components/Kanban/DependencyPanel'
+import PerformancePanel from './components/Insights/PerformancePanel'
 import CardModal from './components/CardModal/CardModal'
 import { parseImportedJson, downloadStateAsJson } from './state/persistence'
 import { StoreProvider, useStore } from './state/store'
 import { buildDependencyInsights } from './utils/dependencies'
+import { buildPerformanceSnapshot } from './utils/metrics'
 import { buildRiskByCardId } from './utils/risk'
 
 function WorkWindowApp() {
@@ -27,6 +29,7 @@ function WorkWindowApp() {
   const unresolvedMap = dependencyInsights.unresolvedCountByCardId
 
   const riskByCardId = useMemo(() => buildRiskByCardId(state.cards), [state.cards])
+  const performanceSnapshot = useMemo(() => buildPerformanceSnapshot(state.cards), [state.cards])
 
   const selectedCard = state.cards.find((card) => card.id === modal.cardId) || null
 
@@ -83,6 +86,7 @@ function WorkWindowApp() {
 
       <main className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-4 xl:grid-cols-[1.1fr_1fr]">
         <section className="space-y-4">
+          <PerformancePanel snapshot={performanceSnapshot} />
           <KanbanBoard
             cards={state.cards}
             unresolvedMap={unresolvedMap}

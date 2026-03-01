@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from 'react'
 import { createId } from '../utils/id'
+import { formatDateKey } from '../utils/date'
 import { createDefaultCard, createInitialState, normalizeState } from './schema'
 import { loadState, saveState } from './persistence'
 
@@ -87,12 +88,23 @@ export function reducer(state, action) {
         ...state,
         cards: state.cards.map((card) => {
           if (card.id !== id) return card
+          const previousCompleted = card.completed_points
           const completed = clamp(card.completed_points + delta, 0, card.estimate_points)
+          const appliedDelta = completed - previousCompleted
           const status = completed >= card.estimate_points ? 'Done' : card.status === 'Done' ? 'In Progress' : card.status
+          const progressLog = Array.isArray(card.progress_log) ? card.progress_log : []
+          const nextProgressLog =
+            appliedDelta === 0
+              ? progressLog
+              : [
+                  ...progressLog,
+                  { id: createId('p'), date: formatDateKey(new Date()), delta: appliedDelta },
+                ]
           return {
             ...card,
             completed_points: completed,
             status,
+            progress_log: nextProgressLog,
           }
         }),
       }

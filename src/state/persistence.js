@@ -1,10 +1,22 @@
-import { STORAGE_KEY, normalizeState, parseImportPayload } from './schema'
+import { LEGACY_STORAGE_KEYS, STORAGE_KEY, normalizeState, parseImportPayload } from './schema'
 
 export function loadState() {
+  const keys = [STORAGE_KEY, ...LEGACY_STORAGE_KEYS]
+
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    return normalizeState(JSON.parse(raw))
+    for (const key of keys) {
+      const raw = localStorage.getItem(key)
+      if (!raw) continue
+      const state = normalizeState(JSON.parse(raw))
+
+      if (key !== STORAGE_KEY) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+      }
+
+      return state
+    }
+
+    return null
   } catch {
     return null
   }
@@ -13,8 +25,9 @@ export function loadState() {
 export function saveState(state) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    LEGACY_STORAGE_KEYS.forEach((legacyKey) => localStorage.removeItem(legacyKey))
   } catch {
-    // ignore localStorage write failures in v1
+    // ignore localStorage write failures
   }
 }
 
