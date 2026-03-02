@@ -10,6 +10,8 @@ npm run dev
 ```
 
 Developer workflow (hooks + CI): see [CONTRIBUTING.md](./CONTRIBUTING.md).
+CI/CD operations (quality gates + production deploy): see [CONTRIBUTING.md](./CONTRIBUTING.md).
+Current CD mode is private-safe artifact promotion + release packaging until public hosting is enabled.
 
 Build for production:
 

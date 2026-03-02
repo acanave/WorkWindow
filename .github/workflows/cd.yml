@@ -1,0 +1,119 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to rebuild and package manually
+        required: true
+        default: main
+        type: string
+
+concurrency:
+  group: cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  promote-from-ci-artifact:
+    name: Promote Release Candidate (from CI artifact)
+    if: >
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Download CI build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.event.workflow_run.head_sha }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: dist
+
+      - name: Verify artifact structure
+        shell: bash
+        run: |
+          test -f dist/index.html
+          test -d dist/assets
+
+      - name: Package candidate artifact
+        shell: bash
+        run: |
+          tar -czf workwindow-dist-${{ github.event.workflow_run.head_sha }}.tar.gz dist
+          sha256sum workwindow-dist-${{ github.event.workflow_run.head_sha }}.tar.gz > workwindow-dist-${{ github.event.workflow_run.head_sha }}.sha256
+
+      - name: Upload release-candidate bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc-${{ github.event.workflow_run.head_sha }}
+          path: |
+            workwindow-dist-${{ github.event.workflow_run.head_sha }}.tar.gz
+            workwindow-dist-${{ github.event.workflow_run.head_sha }}.sha256
+          retention-days: 30
+
+      - name: Deployment summary
+        run: |
+          echo "Promoted commit: ${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Candidate artifact: rc-${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Next step: create a version tag to publish a release artifact." >> "$GITHUB_STEP_SUMMARY"
+
+  promote-manual:
+    name: Promote Release Candidate (manual rebuild)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Package candidate artifact
+        shell: bash
+        run: |
+          SHA=$(git rev-parse HEAD)
+          tar -czf workwindow-dist-${SHA}.tar.gz dist
+          sha256sum workwindow-dist-${SHA}.tar.gz > workwindow-dist-${SHA}.sha256
+          echo "SHA=${SHA}" >> "$GITHUB_ENV"
+
+      - name: Upload manual release-candidate bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc-${{ env.SHA }}
+          path: |
+            workwindow-dist-${{ env.SHA }}.tar.gz
+            workwindow-dist-${{ env.SHA }}.sha256
+          retention-days: 30
+
+      - name: Promotion summary
+        run: |
+          echo "Promoted (manual) commit: ${{ env.SHA }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Candidate artifact: rc-${{ env.SHA }}" >> "$GITHUB_STEP_SUMMARY"
