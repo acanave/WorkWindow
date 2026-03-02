@@ -9,21 +9,21 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: Git ref to rebuild and deploy manually
+        description: Git ref to rebuild and package manually
         required: true
         default: main
         type: string
 
 concurrency:
-  group: cd-production
-  cancel-in-progress: false
+  group: cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  deploy-from-ci-artifact:
-    name: Deploy Production (from CI artifact)
+  promote-from-ci-artifact:
+    name: Promote Release Candidate (from CI artifact)
     if: >
       github.event_name == 'workflow_run' &&
       github.event.workflow_run.conclusion == 'success' &&
@@ -34,16 +34,8 @@ jobs:
     permissions:
       actions: read
       contents: read
-      id-token: write
-      pages: write
-    environment:
-      name: production
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Download build artifact from CI
+      - name: Download CI build artifact
         uses: actions/download-artifact@v4
         with:
           name: dist-${{ github.event.workflow_run.head_sha }}
@@ -51,27 +43,40 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: dist
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Verify artifact structure
+        shell: bash
+        run: |
+          test -f dist/index.html
+          test -d dist/assets
+
+      - name: Package candidate artifact
+        shell: bash
+        run: |
+          tar -czf workwindow-dist-${{ github.event.workflow_run.head_sha }}.tar.gz dist
+          sha256sum workwindow-dist-${{ github.event.workflow_run.head_sha }}.tar.gz > workwindow-dist-${{ github.event.workflow_run.head_sha }}.sha256
+
+      - name: Upload release-candidate bundle
+        uses: actions/upload-artifact@v4
         with:
-          path: dist
+          name: rc-${{ github.event.workflow_run.head_sha }}
+          path: |
+            workwindow-dist-${{ github.event.workflow_run.head_sha }}.tar.gz
+            workwindow-dist-${{ github.event.workflow_run.head_sha }}.sha256
+          retention-days: 30
 
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4
+      - name: Deployment summary
+        run: |
+          echo "Promoted commit: ${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Candidate artifact: rc-${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Next step: create a version tag to publish a release artifact." >> "$GITHUB_STEP_SUMMARY"
 
-  deploy-manual:
-    name: Deploy Production (manual rebuild)
+  promote-manual:
+    name: Promote Release Candidate (manual rebuild)
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       contents: read
-      id-token: write
-      pages: write
-    environment:
-      name: production
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -91,14 +96,24 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+      - name: Package candidate artifact
+        shell: bash
+        run: |
+          SHA=$(git rev-parse HEAD)
+          tar -czf workwindow-dist-${SHA}.tar.gz dist
+          sha256sum workwindow-dist-${SHA}.tar.gz > workwindow-dist-${SHA}.sha256
+          echo "SHA=${SHA}" >> "$GITHUB_ENV"
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload manual release-candidate bundle
+        uses: actions/upload-artifact@v4
         with:
-          path: dist
+          name: rc-${{ env.SHA }}
+          path: |
+            workwindow-dist-${{ env.SHA }}.tar.gz
+            workwindow-dist-${{ env.SHA }}.sha256
+          retention-days: 30
 
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4
+      - name: Promotion summary
+        run: |
+          echo "Promoted (manual) commit: ${{ env.SHA }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Candidate artifact: rc-${{ env.SHA }}" >> "$GITHUB_STEP_SUMMARY"

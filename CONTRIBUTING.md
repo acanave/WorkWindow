@@ -55,31 +55,37 @@ Node version resolution:
 Build artifact policy:
 
 - CI uploads `dist` as an artifact only for pushes to `main`.
-- CD promotes that exact artifact to production for repeatable deployments.
+- CD promotes that exact artifact as a **release candidate** for repeatable delivery.
 
 ## CD workflow
 
 GitHub Actions workflow: `.github/workflows/cd.yml`
 
-Automatic production deploy:
+Automatic release-candidate promotion:
 
 - Trigger: successful `CI` workflow run for a `push` to `main`
-- Deploys immutable CI artifact to GitHub Pages
-- Uses GitHub `production` environment
+- Packages immutable CI artifact with checksum
+- Stores candidate bundle as Actions artifact (`rc-<sha>`)
 
-Manual production redeploy:
+Manual release-candidate promotion:
 
 - Trigger: `workflow_dispatch` with a `ref` input
-- Rebuilds and deploys from that ref
-- Intended for emergency recovery / controlled redeploys
+- Rebuilds and packages candidate bundle from that ref
+- Intended for controlled recovery/rebuild scenarios
 
-### Required repository setup for CD
+## Release workflow
 
-1. In **Settings -> Pages**, set source to **GitHub Actions**.
-2. In **Settings -> Environments -> production**:
-   - add required reviewers (recommended)
-   - optionally add a wait timer
-3. Keep `main` protection enabled so only reviewed PRs can trigger production deploy.
+GitHub Actions workflow: `.github/workflows/release.yml`
+
+- Triggered on semantic version tags (`v*.*.*`) or manual dispatch.
+- Re-runs quality gates (`lint`, `format:check`, `test`, `build`).
+- Publishes a GitHub Release with immutable build bundle + SHA256 checksum.
+
+### Recommended repository setup
+
+1. Keep `main` protection enabled so only reviewed PRs can trigger candidate promotion.
+2. Use release tags (`vX.Y.Z`) from `main` only.
+3. If manual release dispatch is used, preserve tag naming discipline and changelog notes.
 
 ## Main branch protection (classic rule)
 
