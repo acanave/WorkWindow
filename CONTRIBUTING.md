@@ -21,12 +21,13 @@ npm run prepare
 - Staged `*.json,*.md,*.yml,*.yaml,*.css,*.scss,*.html`: `prettier -w`
 - Full test/build is intentionally **not** part of pre-commit for speed.
 
-### Optional pre-push gate
+### Pre-push gate
 
-- Pre-push hook (`.husky/pre-push`) runs:
+- Pre-push hook (`.husky/pre-push`) enforces:
+  - Hard block for direct pushes to `main`
   - `npm run test`
   - `npm run build`
-- This is a stronger local safety net before code leaves your machine.
+- Tests/build currently run for pushes to any branch (fast enough for this repo).
 
 ## CI checks
 
@@ -51,10 +52,25 @@ Node version resolution:
 - `package.json` `engines.node` second
 - fallback to Node 20
 
-## Recommended branch protection for `main` (manual GitHub settings)
+## Main branch protection (classic rule)
 
-1. Require pull request before merging.
+This repository is currently private and GitHub API returns `HTTP 403` for branch
+protection/rulesets on the active account plan.
+
+Define a classic branch protection rule for `main` with:
+
+1. Require a pull request before merging.
 2. Require status checks to pass before merging.
-3. Select required check: `CI / Validate`.
-4. Require branches to be up to date before merging.
-5. Restrict force pushes and branch deletions on `main`.
+3. Required check: `CI / Validate`.
+4. Block force pushes.
+5. Block deletions.
+
+If GitHub shows this as not enforced due plan/account limits, keep the rule as
+documented policy and use local enforcement below.
+
+## Local enforcement fallback
+
+1. `.husky/pre-push` blocks any push targeting `main` by default.
+2. Direct push override exists for emergencies only and must be deliberate:
+   `ALLOW_MAIN_PUSH=1 git push ...`
+3. CI (`CI / Validate`) runs on pushes and pull requests to `main`.

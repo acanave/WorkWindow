@@ -1,2 +1,15 @@
 #!/usr/bin/env sh
+
+protected_ref='refs/heads/main'
+
+while read -r _local_ref _local_sha remote_ref _remote_sha
+do
+  if [ "$remote_ref" = "$protected_ref" ] && [ -z "$ALLOW_MAIN_PUSH" ]; then
+    echo "Push rejected: direct pushes to main are blocked for this repo."
+    echo "Create a feature branch and open a pull request instead."
+    echo "Override once (not recommended): ALLOW_MAIN_PUSH=1 git push ..."
+    exit 1
+  fi
+done
+
 npm run test && npm run build
