@@ -21,8 +21,17 @@ describe('buildPerformanceSnapshot', () => {
   it('computes totals and burnup coverage', () => {
     const snapshot = buildPerformanceSnapshot(
       [
-        makeCard({ estimate_points: 8, completed_points: 3, planned_day_blocks: [{ id: 'b1', date: '2026-03-01', points: 2 }] }),
-        makeCard({ id: 'c2', estimate_points: 4, completed_points: 2, planned_day_blocks: [{ id: 'b2', date: '2026-03-03', points: 3 }] }),
+        makeCard({
+          estimate_points: 8,
+          completed_points: 3,
+          planned_day_blocks: [{ id: 'b1', date: '2026-03-01', points: 2 }],
+        }),
+        makeCard({
+          id: 'c2',
+          estimate_points: 4,
+          completed_points: 2,
+          planned_day_blocks: [{ id: 'b2', date: '2026-03-03', points: 3 }],
+        }),
       ],
       '2026-03-01',
     )

@@ -19,14 +19,10 @@ function makeProps(selectedDate) {
 describe('MonthCalendar', () => {
   it('syncs visible month when selectedDate changes externally', () => {
     const { rerender } = render(<MonthCalendar {...makeProps('2026-03-10')} />)
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
-      monthLabel(parseDateKey('2026-03-10')),
-    )
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(monthLabel(parseDateKey('2026-03-10')))
 
     rerender(<MonthCalendar {...makeProps('2026-05-10')} />)
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
-      monthLabel(parseDateKey('2026-05-10')),
-    )
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(monthLabel(parseDateKey('2026-05-10')))
   })
 
   it('filters visible day blocks by selected statuses', async () => {
