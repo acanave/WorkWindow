@@ -63,14 +63,9 @@ export default function CardModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-xl rounded-lg bg-white p-4 shadow-xl"
-        onClick={(event) => event.stopPropagation()}
-      >
+      <div className="w-full max-w-xl rounded-lg bg-white p-4 shadow-xl" onClick={(event) => event.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">
-            {mode === 'create' ? 'Create Card' : 'Edit Card'}
-          </h2>
+          <h2 className="text-lg font-semibold text-slate-900">{mode === 'create' ? 'Create Card' : 'Edit Card'}</h2>
           <button onClick={onClose} className="rounded border border-slate-300 px-2 py-1 text-sm">
             Close
           </button>
@@ -159,14 +154,13 @@ export default function CardModal({
                 <p className="text-xs text-amber-800">No unresolved dependencies.</p>
               ) : (
                 <ul className="space-y-1">
-                  {(unresolvedSelectedDependencies.length > 0
-                    ? unresolvedSelectedDependencies
-                    : blockedBy
-                  ).map((dep) => (
-                    <li key={dep.id} className="text-xs text-amber-900">
-                      {dep.title} ({dep.status})
-                    </li>
-                  ))}
+                  {(unresolvedSelectedDependencies.length > 0 ? unresolvedSelectedDependencies : blockedBy).map(
+                    (dep) => (
+                      <li key={dep.id} className="text-xs text-amber-900">
+                        {dep.title} ({dep.status})
+                      </li>
+                    ),
+                  )}
                 </ul>
               )}
             </section>

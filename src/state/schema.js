@@ -167,9 +167,7 @@ function assertImportPayload(parsed) {
     throw new Error('Import payload has too many cards')
   }
 
-  const explicitIds = parsed.cards
-    .map((card) => card?.id)
-    .filter((id) => typeof id === 'string' && id.length > 0)
+  const explicitIds = parsed.cards.map((card) => card?.id).filter((id) => typeof id === 'string' && id.length > 0)
   const idSet = new Set(explicitIds)
   if (idSet.size !== explicitIds.length) {
     throw new Error('Import payload has duplicate card IDs')

@@ -1,6 +1,5 @@
 export default function DependencyPanel({ cards, dependencyInsights, onOpenCard }) {
-  const { blockedByByCardId, dependentsByCardId, unresolvedCountByCardId, chainByCardId, cardById } =
-    dependencyInsights
+  const { blockedByByCardId, dependentsByCardId, unresolvedCountByCardId, chainByCardId, cardById } = dependencyInsights
 
   const cardsWithDependencies = cards
     .filter((card) => (card.dependencies?.length || 0) > 0 || (dependentsByCardId[card.id] || []).length > 0)
@@ -17,9 +16,7 @@ export default function DependencyPanel({ cards, dependencyInsights, onOpenCard 
         <span className="text-xs text-slate-500">Live blockers and dependents</span>
       </div>
 
-      {cardsWithDependencies.length === 0 && (
-        <p className="text-sm text-slate-500">No dependency links yet.</p>
-      )}
+      {cardsWithDependencies.length === 0 && <p className="text-sm text-slate-500">No dependency links yet.</p>}
 
       <div className="space-y-2">
         {cardsWithDependencies.map((card) => {
@@ -43,9 +40,7 @@ export default function DependencyPanel({ cards, dependencyInsights, onOpenCard 
               </div>
 
               {blockers.length > 0 && (
-                <p className="text-xs text-slate-700">
-                  Blocked by: {blockers.map((dep) => dep.title).join(', ')}
-                </p>
+                <p className="text-xs text-slate-700">Blocked by: {blockers.map((dep) => dep.title).join(', ')}</p>
               )}
 
               {dependentIds.length > 0 && (
@@ -54,9 +49,7 @@ export default function DependencyPanel({ cards, dependencyInsights, onOpenCard 
                 </p>
               )}
 
-              {chain.length > 1 && (
-                <p className="mt-1 text-xs text-slate-600">Chain: {chain.join(' -> ')}</p>
-              )}
+              {chain.length > 1 && <p className="mt-1 text-xs text-slate-600">Chain: {chain.join(' -> ')}</p>}
             </article>
           )
         })}

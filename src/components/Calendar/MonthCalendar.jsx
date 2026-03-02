@@ -74,10 +74,7 @@ export default function MonthCalendar({
           >
             Next
           </button>
-          <button
-            onClick={jumpToToday}
-            className="rounded border border-slate-300 px-2 py-1 text-sm"
-          >
+          <button onClick={jumpToToday} className="rounded border border-slate-300 px-2 py-1 text-sm">
             Today
           </button>
         </div>
