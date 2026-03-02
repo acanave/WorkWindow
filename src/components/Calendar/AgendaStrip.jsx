@@ -24,9 +24,7 @@ export default function AgendaStrip({
                 {risk && (
                   <span
                     className={`rounded px-2 py-0.5 text-[11px] font-medium ${
-                      risk.kind === 'overdue'
-                        ? 'bg-rose-100 text-rose-800'
-                        : 'bg-orange-100 text-orange-800'
+                      risk.kind === 'overdue' ? 'bg-rose-100 text-rose-800' : 'bg-orange-100 text-orange-800'
                     }`}
                     title={`Due ${risk.dueDate} • ${risk.remainingPoints} pts left • ${risk.plannedBeforeDue} pts planned`}
                   >

@@ -46,10 +46,7 @@ export function reducer(state, action) {
           if (card.id !== cardId) return card
           return {
             ...card,
-            planned_day_blocks: [
-              ...card.planned_day_blocks,
-              { id: createId('b'), date, points: clampPoints(points) },
-            ],
+            planned_day_blocks: [...card.planned_day_blocks, { id: createId('b'), date, points: clampPoints(points) }],
           }
         }),
       }
@@ -91,15 +88,13 @@ export function reducer(state, action) {
           const previousCompleted = card.completed_points
           const completed = clamp(card.completed_points + delta, 0, card.estimate_points)
           const appliedDelta = completed - previousCompleted
-          const status = completed >= card.estimate_points ? 'Done' : card.status === 'Done' ? 'In Progress' : card.status
+          const status =
+            completed >= card.estimate_points ? 'Done' : card.status === 'Done' ? 'In Progress' : card.status
           const progressLog = Array.isArray(card.progress_log) ? card.progress_log : []
           const nextProgressLog =
             appliedDelta === 0
               ? progressLog
-              : [
-                  ...progressLog,
-                  { id: createId('p'), date: formatDateKey(new Date()), delta: appliedDelta },
-                ]
+              : [...progressLog, { id: createId('p'), date: formatDateKey(new Date()), delta: appliedDelta }]
           return {
             ...card,
             completed_points: completed,

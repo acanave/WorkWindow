@@ -78,9 +78,7 @@ export default function KanbanBoard({
                 type="button"
                 onClick={() => toggleStatus(status)}
                 className={`rounded border px-2 py-1 text-xs ${
-                  active
-                    ? 'border-slate-900 bg-slate-900 text-white'
-                    : 'border-slate-300 bg-white text-slate-700'
+                  active ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-300 bg-white text-slate-700'
                 }`}
               >
                 {status}

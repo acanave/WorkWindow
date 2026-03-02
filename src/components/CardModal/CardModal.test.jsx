@@ -23,10 +23,7 @@ describe('CardModal', () => {
       <CardModal
         mode="edit"
         card={makeCard()}
-        allCards={[
-          makeCard(),
-          makeCard({ id: 'c2', title: 'Task B', status: 'Blocked', dependencies: [] }),
-        ]}
+        allCards={[makeCard(), makeCard({ id: 'c2', title: 'Task B', status: 'Blocked', dependencies: [] })]}
         blockedBy={[{ id: 'c2', title: 'Task B', status: 'Blocked' }]}
         onClose={vi.fn()}
         onCreate={vi.fn()}

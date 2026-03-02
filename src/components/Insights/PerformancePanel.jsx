@@ -44,7 +44,9 @@ export default function PerformancePanel({ snapshot }) {
           label="Forecast (7d)"
           value={`${projected} pts`}
           detail="Remaining if current plan is executed"
-          percent={snapshot.totals.remaining === 0 ? 100 : clampPercent(100 - (projected / snapshot.totals.remaining) * 100)}
+          percent={
+            snapshot.totals.remaining === 0 ? 100 : clampPercent(100 - (projected / snapshot.totals.remaining) * 100)
+          }
           tone="amber"
         />
       </div>

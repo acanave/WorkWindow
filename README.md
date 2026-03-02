@@ -9,6 +9,8 @@ npm install
 npm run dev
 ```
 
+Developer workflow (hooks + CI): see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 Build for production:
 
 ```bash
@@ -48,6 +50,7 @@ State is stored in localStorage with key `workwindow:data:v2` (auto-migrated fro
 ```
 
 Rules:
+
 - `total_planned_points = sum(planned_day_blocks.points)`
 - `completion = completed_points / estimate_points`
 - if `completed_points >= estimate_points`, card auto moves to `Done`

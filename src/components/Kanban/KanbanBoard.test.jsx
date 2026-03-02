@@ -64,24 +64,23 @@ describe('KanbanBoard', () => {
 
     const backlogHeading = screen.getByRole('heading', { level: 3, name: 'Backlog' })
     const backlogSection = backlogHeading.closest('section')
-    const titles = within(backlogSection).getAllByRole('heading', { level: 4 }).map((node) => node.textContent)
+    const titles = within(backlogSection)
+      .getAllByRole('heading', { level: 4 })
+      .map((node) => node.textContent)
 
     expect(titles).toEqual(['Due sooner', 'Due later', 'No due'])
   })
 
   it('shows risk badge for cards with due-date shortfall', () => {
-    renderBoard(
-      [makeCard({ id: 'c1', title: 'At risk task' })],
-      {
-        c1: {
-          kind: 'at_risk',
-          dueDate: '2026-03-10',
-          remainingPoints: 4,
-          plannedBeforeDue: 2,
-          shortfall: 2,
-        },
+    renderBoard([makeCard({ id: 'c1', title: 'At risk task' })], {
+      c1: {
+        kind: 'at_risk',
+        dueDate: '2026-03-10',
+        remainingPoints: 4,
+        plannedBeforeDue: 2,
+        shortfall: 2,
       },
-    )
+    })
 
     expect(screen.getByText('Short 2pt')).toBeInTheDocument()
   })
