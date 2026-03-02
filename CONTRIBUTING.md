@@ -52,6 +52,35 @@ Node version resolution:
 - `package.json` `engines.node` second
 - fallback to Node 20
 
+Build artifact policy:
+
+- CI uploads `dist` as an artifact only for pushes to `main`.
+- CD promotes that exact artifact to production for repeatable deployments.
+
+## CD workflow
+
+GitHub Actions workflow: `.github/workflows/cd.yml`
+
+Automatic production deploy:
+
+- Trigger: successful `CI` workflow run for a `push` to `main`
+- Deploys immutable CI artifact to GitHub Pages
+- Uses GitHub `production` environment
+
+Manual production redeploy:
+
+- Trigger: `workflow_dispatch` with a `ref` input
+- Rebuilds and deploys from that ref
+- Intended for emergency recovery / controlled redeploys
+
+### Required repository setup for CD
+
+1. In **Settings -> Pages**, set source to **GitHub Actions**.
+2. In **Settings -> Environments -> production**:
+   - add required reviewers (recommended)
+   - optionally add a wait timer
+3. Keep `main` protection enabled so only reviewed PRs can trigger production deploy.
+
 ## Main branch protection (classic rule)
 
 This repository is currently private and GitHub API returns `HTTP 403` for branch

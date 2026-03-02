@@ -10,6 +10,7 @@ npm run dev
 ```
 
 Developer workflow (hooks + CI): see [CONTRIBUTING.md](./CONTRIBUTING.md).
+CI/CD operations (quality gates + production deploy): see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 Build for production:
 
