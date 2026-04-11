@@ -5,6 +5,7 @@ import KanbanColumn from './KanbanColumn'
 
 export default function KanbanBoard({
   cards,
+  selectedDate,
   unresolvedMap,
   chainDepthByCardId = {},
   hasCycleByCardId = {},
@@ -13,6 +14,7 @@ export default function KanbanBoard({
   onOpenCard,
   onMoveCard,
   onLogProgress,
+  onPlanCardToSelectedDate,
 }) {
   const [query, setQuery] = useState('')
   const [sortBy, setSortBy] = useState('manual')
@@ -86,6 +88,9 @@ export default function KanbanBoard({
             )
           })}
         </div>
+        <p className="text-xs text-slate-500">
+          Touch fallback: use each card&apos;s status menu or plan it directly to the selected day ({selectedDate}).
+        </p>
       </div>
       <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
         {statusesToRender.map((status) => (
@@ -93,6 +98,7 @@ export default function KanbanBoard({
             key={status}
             status={status}
             cards={sortedCards.filter((card) => card.status === status)}
+            selectedDate={selectedDate}
             unresolvedMap={unresolvedMap}
             chainDepthByCardId={chainDepthByCardId}
             hasCycleByCardId={hasCycleByCardId}
@@ -100,6 +106,7 @@ export default function KanbanBoard({
             onOpenCard={onOpenCard}
             onMoveCard={onMoveCard}
             onLogProgress={onLogProgress}
+            onPlanCardToSelectedDate={onPlanCardToSelectedDate}
           />
         ))}
       </div>

@@ -1,6 +1,21 @@
 import { useRef } from 'react'
 
-export default function AppHeader({ onNewCard, onExport, onImport, theme, onToggleTheme }) {
+const SYNC_STATUS_LABELS = {
+  saved: 'Synced',
+  saving: 'Syncing...',
+  error: 'Sync error',
+}
+
+export default function AppHeader({
+  onNewCard,
+  onExport,
+  onImport,
+  onSignOut,
+  theme,
+  onToggleTheme,
+  userEmail,
+  syncStatus = 'saved',
+}) {
   const inputRef = useRef(null)
 
   const handlePickFile = () => {
@@ -20,7 +35,19 @@ export default function AppHeader({ onNewCard, onExport, onImport, theme, onTogg
     <header className="border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
       <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">WorkWindow</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="mr-2 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <span
+              className={`rounded-full px-2 py-1 font-medium ${
+                syncStatus === 'error'
+                  ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-200'
+                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200'
+              }`}
+            >
+              {SYNC_STATUS_LABELS[syncStatus] || SYNC_STATUS_LABELS.saved}
+            </span>
+            <span className="max-w-[220px] truncate">{userEmail}</span>
+          </div>
           <button
             onClick={onToggleTheme}
             className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -44,6 +71,12 @@ export default function AppHeader({ onNewCard, onExport, onImport, theme, onTogg
             className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
           >
             Import JSON
+          </button>
+          <button
+            onClick={onSignOut}
+            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+          >
+            Sign Out
           </button>
           <input
             ref={inputRef}

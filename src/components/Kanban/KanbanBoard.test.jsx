@@ -23,6 +23,7 @@ function renderBoard(cards, riskByCardId = {}, chainDepthByCardId = {}, hasCycle
   return render(
     <KanbanBoard
       cards={cards}
+      selectedDate="2026-03-10"
       unresolvedMap={{}}
       chainDepthByCardId={chainDepthByCardId}
       hasCycleByCardId={hasCycleByCardId}
@@ -31,6 +32,7 @@ function renderBoard(cards, riskByCardId = {}, chainDepthByCardId = {}, hasCycle
       onOpenCard={noop}
       onMoveCard={noop}
       onLogProgress={noop}
+      onPlanCardToSelectedDate={noop}
     />,
   )
 }
@@ -95,5 +97,55 @@ describe('KanbanBoard', () => {
 
     expect(screen.getByText('Chain 3 deep')).toBeInTheDocument()
     expect(screen.getByText('Cycle')).toBeInTheDocument()
+  })
+
+  it('plans a card to the selected day with the touch fallback action', async () => {
+    const user = userEvent.setup()
+    const onPlanCardToSelectedDate = vi.fn()
+
+    render(
+      <KanbanBoard
+        cards={[makeCard({ id: 'c1', title: 'Touch task' })]}
+        selectedDate="2026-03-10"
+        unresolvedMap={{}}
+        chainDepthByCardId={{}}
+        hasCycleByCardId={{}}
+        riskByCardId={{}}
+        onCreateCard={noop}
+        onOpenCard={noop}
+        onMoveCard={noop}
+        onLogProgress={noop}
+        onPlanCardToSelectedDate={onPlanCardToSelectedDate}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /plan to 2026-03-10/i }))
+
+    expect(onPlanCardToSelectedDate).toHaveBeenCalledWith('c1')
+  })
+
+  it('moves a card with the touch fallback status menu', async () => {
+    const user = userEvent.setup()
+    const onMoveCard = vi.fn()
+
+    render(
+      <KanbanBoard
+        cards={[makeCard({ id: 'c1', title: 'Touch task' })]}
+        selectedDate="2026-03-10"
+        unresolvedMap={{}}
+        chainDepthByCardId={{}}
+        hasCycleByCardId={{}}
+        riskByCardId={{}}
+        onCreateCard={noop}
+        onOpenCard={noop}
+        onMoveCard={onMoveCard}
+        onLogProgress={noop}
+        onPlanCardToSelectedDate={noop}
+      />,
+    )
+
+    await user.selectOptions(screen.getByLabelText(/move touch task/i), 'Blocked')
+
+    expect(onMoveCard).toHaveBeenCalledWith('c1', 'Blocked')
   })
 })

@@ -4,3 +4,6 @@ dist
 .DS_Store
 workwindow-export.json
 .vscode
+.env
+.env.local
+.env.*.local
