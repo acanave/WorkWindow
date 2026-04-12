@@ -3,6 +3,7 @@ import TaskCard from './TaskCard'
 export default function KanbanColumn({
   status,
   cards,
+  selectedDate,
   unresolvedMap,
   chainDepthByCardId,
   hasCycleByCardId,
@@ -10,6 +11,7 @@ export default function KanbanColumn({
   onOpenCard,
   onMoveCard,
   onLogProgress,
+  onPlanCardToSelectedDate,
 }) {
   const handleDragOver = (event) => {
     event.preventDefault()
@@ -34,12 +36,15 @@ export default function KanbanColumn({
           <TaskCard
             key={card.id}
             card={card}
+            selectedDate={selectedDate}
             unresolvedDependencyCount={unresolvedMap[card.id] || 0}
             chainDepth={chainDepthByCardId[card.id] || 0}
             hasDependencyCycle={hasCycleByCardId[card.id] || false}
             risk={riskByCardId[card.id] || null}
             onOpen={() => onOpenCard(card.id)}
+            onMoveCard={onMoveCard}
             onLogProgress={onLogProgress}
+            onPlanSelectedDate={onPlanCardToSelectedDate}
           />
         ))}
       </div>
