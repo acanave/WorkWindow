@@ -12,13 +12,16 @@ export default function AuthScreen({ errorMessage }) {
     event.preventDefault()
     if (!isSupabaseConfigured()) return
 
+    const normalizedEmail = email.trim().toLowerCase()
+    if (!normalizedEmail) return
+
     setPending(true)
     setNotice('')
 
     try {
       const supabase = getSupabaseClient()
       const { error } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
+        email: normalizedEmail,
         options: {
           emailRedirectTo: window.location.origin,
         },
@@ -40,7 +43,7 @@ export default function AuthScreen({ errorMessage }) {
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">Secure Sync</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">WorkWindow</h1>
         <p className="mt-3 text-sm leading-6 text-slate-300">
-          Sign in with a magic link to keep your board private and available from your iPhone and desktop.
+          Sign in with a magic link to sync your workspace across devices using your own Supabase project.
         </p>
 
         {configError && (

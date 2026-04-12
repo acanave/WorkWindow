@@ -1,56 +1,99 @@
-# WorkWindow (V1)
+# WorkWindow
 
-Local-first planning app that combines a Kanban board with a month calendar using day blocks (points per day, not hourly slots).
+WorkWindow is a local-first planning app that combines a Kanban board with a month calendar, dependency visibility, and lightweight performance metrics. It was built to feel fast for solo execution while still being capable of optional cloud sync and multi-device access.
 
-## Secure Remote Access
+![WorkWindow launch modes](docs/screenshots/mode-chooser.svg)
+![WorkWindow board overview](docs/screenshots/board-overview.svg)
 
-This app can be deployed securely so the same private workspace is available from your iPhone and desktop.
+## Why this repo exists
 
-Architecture:
+This project is meant to showcase:
 
-- Vercel hosts the Vite frontend
-- Supabase Auth handles sign-in with a magic link
-- Supabase Postgres stores one JSON state document per user
-- Row Level Security ensures each authenticated user can only read and write their own row
+- product thinking around planning workflows, not just CRUD forms
+- a local-first architecture that remains useful without infrastructure
+- a clean upgrade path to authenticated cloud sync with Supabase
+- practical frontend engineering with state normalization, tests, and deploy-ready configuration
 
-Security rules for this repo:
+## Launch Paths
 
-- Put `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in local or hosted env vars
-- Never commit `.env` files
-- Never use a Supabase service role key in the frontend
-- Apply the SQL in [docs/supabase.sql](./docs/supabase.sql) before using cloud sync
+### Local-first quick start
 
-Setup:
-
-1. Create a Supabase project.
-2. Enable Email OTP / Magic Link auth in Supabase.
-3. Run the SQL in [docs/supabase.sql](./docs/supabase.sql).
-4. Copy [.env.example](./.env.example) to `.env.local` and fill in your Supabase URL and publishable key.
-5. Add the same env vars in Vercel for production.
-6. In Supabase Auth settings, add your Vercel URL and local dev URL as redirect URLs.
-7. Deploy with Vercel using [vercel.json](./vercel.json) so the security headers are applied in production.
-
-## Setup / Run
+Use this path if you want to evaluate the product immediately with no external services.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Developer workflow (hooks + CI): see [CONTRIBUTING.md](./CONTRIBUTING.md).
-CI/CD operations (quality gates + production deploy): see [CONTRIBUTING.md](./CONTRIBUTING.md).
-Current CD mode is private-safe artifact promotion + release packaging until public hosting is enabled.
+If no cloud env vars are present, the app opens with a mode chooser:
 
-Build for production:
+- `Local First` launches the full planner using browser storage only
+- `Cloud Sync` shows the setup path for Supabase-backed auth and sync
+
+### Cloud sync and hosted setup
+
+Use this path if you want authenticated sync across devices or a hosted deployment.
+
+1. Create a Supabase project.
+2. Enable Email OTP / Magic Link authentication.
+3. Run [docs/supabase.sql](./docs/supabase.sql) in the Supabase SQL editor.
+4. Copy [.env.example](./.env.example) to `.env.local`.
+5. Fill in:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`
+6. Restart `npm run dev` or deploy the app with the same env vars.
+7. If you deploy to Vercel, add your app URL to Supabase redirect settings.
+
+Notes:
+
+- `.env.example` contains placeholders only.
+- `.env.local` is not committed.
+- `.vercel` is ignored, so no live Vercel project linkage is committed.
+- The frontend uses only the Supabase publishable key. Never place a service-role key in Vite env vars.
+
+## Architecture
+
+- `React + Vite` frontend with a local-first UX
+- `localStorage` persistence for instant evaluation and offline-friendly use
+- optional `Supabase Auth + Postgres` sync for authenticated multi-device access
+- `RLS-backed user_states` row model for cloud sync
+- `vercel.json` security headers for hosted deployments
+
+## Product Highlights
+
+- Kanban board with Backlog, In Progress, Blocked, and Done lanes
+- Month calendar with draggable planning blocks
+- dependency warnings, chain visibility, and cycle badges
+- due-date risk signals and shortfall indicators
+- performance panel with burnup, plan coverage, and weekly velocity
+- JSON import/export for portable local data
+- touch-friendly fallback actions for planning and status changes
+
+## Engineering Highlights
+
+- normalized app state with schema migration scaffolding
+- reusable reducer/store setup with import replacement support
+- optional cloud bootstrap that hydrates local state from Supabase
+- test coverage for state logic, calendar interactions, dependency views, and planning fallbacks
+- public-safe config posture with no committed secrets or personal deployment linkage
+
+## Quality Checks
 
 ```bash
+npm run test
 npm run build
+npm run lint
+```
+
+Build preview:
+
+```bash
 npm run preview
 ```
 
-## Data model
+## Data Model
 
-State is cached in localStorage with key `workwindow:data:v2` and synced to the authenticated user's Supabase row.
+State is stored locally with key `workwindow:data:v2`. When cloud sync is configured, that same normalized state is stored in the authenticated user's `user_states` row.
 
 ```js
 {
@@ -63,65 +106,25 @@ State is cached in localStorage with key `workwindow:data:v2` and synced to the 
       id,
       title,
       description,
-      status, // Backlog | In Progress | Blocked | Done
+      status,
       estimate_points,
-      due_date, // YYYY-MM-DD | null
+      due_date,
       dependencies: [cardId],
-      planned_day_blocks: [
-        { id, date: "YYYY-MM-DD", points: 1 }
-      ],
+      planned_day_blocks: [{ id, date: "YYYY-MM-DD", points: 1 }],
       completed_points,
-      progress_log: [
-        { id, date: "YYYY-MM-DD", delta: 1 }
-      ]
+      progress_log: [{ id, date: "YYYY-MM-DD", delta: 1 }]
     }
   ]
 }
 ```
 
-Rules:
+## Known Limitations
 
-- `total_planned_points = sum(planned_day_blocks.points)`
-- `completion = completed_points / estimate_points`
-- if `completed_points >= estimate_points`, card auto moves to `Done`
-- dependencies are warning-only (not scheduling blockers)
-- progress updates are tracked in `progress_log` for velocity metrics
-- import replaces all app data
+- tests cover core flows, but not every interaction edge case
+- the calendar is month-only today
+- mobile uses touch-friendly action fallbacks instead of advanced drag-and-drop
+- there is no automatic scheduling suggestion engine yet
 
-## Implemented V1 features
+## Development Notes
 
-- Kanban board with 4 columns: Backlog, In Progress, Blocked, Done
-- Board search, status filters, and sorting (created order, due date, progress)
-- Create, edit, delete cards
-- Drag card between columns (status update)
-- Month calendar grid with day chips for planned blocks
-- Calendar status filters for visible planned day blocks
-- Drag card from board to day cell to create a 1-point block
-- Edit/delete day block chips (points 1-8)
-- Selected-day agenda strip with block editing
-- Card progress controls (`+1` / `-1` completed points)
-- Due-date risk warnings (overdue or planned-point shortfall) on cards and agenda
-- Dependency warning badges with chain/cycle highlights on cards
-- Dependency graph panel with blocker/dependent chain visibility
-- “Blocked by” section in card modal for unresolved dependencies
-- Performance panel with burnup, plan coverage, weekly velocity, and 7-day forecast
-- Schema v1 -> v2 migration scaffolding and stricter import validation
-- localStorage persistence with schema normalization
-- Export JSON / Import JSON
-
-## Known limitations
-
-- Automated tests cover core flows but are not exhaustive yet
-- Uses basic HTML5 drag/drop (no advanced touch DnD handling)
-- Calendar is month-only in v1
-- No automatic scheduling suggestions when risk is detected
-- iPhone access now has button-based fallbacks for planning and status changes, but desktop drag/drop is still the richer workflow
-
-## V2 backlog
-
-- Better dependency visuals and critical path hints
-- Velocity trends and burnup/burndown views
-- Recurring planning templates
-- Calendar filters by status/tag
-- Better mobile drag/drop UX
-- Optional daily capacity targets
+Developer workflow and repository checks live in [CONTRIBUTING.md](./CONTRIBUTING.md).

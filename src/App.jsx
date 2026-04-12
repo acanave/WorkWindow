@@ -6,6 +6,8 @@ import KanbanBoard from './components/Kanban/KanbanBoard'
 import DependencyPanel from './components/Kanban/DependencyPanel'
 import PerformancePanel from './components/Insights/PerformancePanel'
 import CardModal from './components/CardModal/CardModal'
+import CloudSetupScreen from './components/Mode/CloudSetupScreen'
+import ModeChooserScreen from './components/Mode/ModeChooserScreen'
 import { getSupabaseClient, isSupabaseConfigured } from './lib/supabase'
 import { fetchRemoteState, saveRemoteState } from './state/cloud'
 import { loadState, parseImportedJson, downloadStateAsJson, saveState } from './state/persistence'
@@ -15,7 +17,49 @@ import { buildDependencyInsights } from './utils/dependencies'
 import { buildPerformanceSnapshot } from './utils/metrics'
 import { buildRiskByCardId } from './utils/risk'
 
-function WorkWindowApp({ user, onSignOut }) {
+const LAUNCH_MODE_KEY = 'workwindow:launch-mode'
+
+const LAUNCH_MODES = {
+  cloud: 'cloud',
+  local: 'local',
+}
+
+function getAccessErrorMessage(error, fallbackMessage) {
+  const message = error?.message || ''
+
+  if (message.toLowerCase().includes('row-level security')) {
+    return 'This account does not have access to the synced workspace.'
+  }
+
+  return message || fallbackMessage
+}
+
+function getStoredLaunchMode() {
+  try {
+    const value = window.localStorage.getItem(LAUNCH_MODE_KEY)
+    return value === LAUNCH_MODES.local || value === LAUNCH_MODES.cloud ? value : null
+  } catch {
+    return null
+  }
+}
+
+function setStoredLaunchMode(mode) {
+  try {
+    window.localStorage.setItem(LAUNCH_MODE_KEY, mode)
+  } catch {
+    // ignore localStorage write failures
+  }
+}
+
+function clearStoredLaunchMode() {
+  try {
+    window.localStorage.removeItem(LAUNCH_MODE_KEY)
+  } catch {
+    // ignore localStorage write failures
+  }
+}
+
+function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, user = null, onSignOut = null }) {
   const { state, dispatch } = useStore()
   const [modal, setModal] = useState({ open: false, mode: 'create', cardId: null })
   const [syncStatus, setSyncStatus] = useState('saved')
@@ -32,7 +76,7 @@ function WorkWindowApp({ user, onSignOut }) {
   }, [theme])
 
   useEffect(() => {
-    if (!user?.id) return
+    if (!cloudSyncEnabled || !user?.id) return
     if (!hasMountedRef.current) {
       hasMountedRef.current = true
       return
@@ -51,7 +95,7 @@ function WorkWindowApp({ user, onSignOut }) {
     }, 500)
 
     return () => window.clearTimeout(timeoutId)
-  }, [state, user?.id])
+  }, [cloudSyncEnabled, state, user?.id])
 
   const dependencyInsights = useMemo(() => buildDependencyInsights(state.cards), [state.cards])
   const unresolvedMap = dependencyInsights.unresolvedCountByCardId
@@ -70,7 +114,6 @@ function WorkWindowApp({ user, onSignOut }) {
   const deleteCard = (id) => dispatch({ type: 'CARD_DELETE', payload: { id } })
   const moveCard = (id, status) => dispatch({ type: 'CARD_MOVE_STATUS', payload: { id, status } })
   const setSelectedDate = (date) => dispatch({ type: 'UI_SET_SELECTED_DATE', payload: { date } })
-
   const logProgress = (id, delta) => dispatch({ type: 'CARD_LOG_PROGRESS', payload: { id, delta } })
 
   const addDayBlock = (cardId, date) => {
@@ -112,10 +155,12 @@ function WorkWindowApp({ user, onSignOut }) {
         onNewCard={openCreate}
         onExport={handleExport}
         onImport={handleImport}
-        onSignOut={onSignOut}
+        onSignOut={cloudSyncEnabled ? onSignOut : null}
+        onShowCloudSetup={onShowCloudSetup}
         theme={theme}
         onToggleTheme={toggleTheme}
-        userEmail={user.email}
+        userEmail={cloudSyncEnabled ? user?.email : null}
+        modeLabel={modeLabel}
         syncStatus={syncStatus}
       />
 
@@ -283,7 +328,7 @@ function useBootstrapState(user) {
       } catch (error) {
         if (cancelled) return
         setBootstrap({
-          errorMessage: error.message || 'Unable to load your secure workspace.',
+          errorMessage: getAccessErrorMessage(error, 'Unable to load your synced workspace.'),
           state: createInitialState(),
           status: 'error',
         })
@@ -318,7 +363,7 @@ function SecureApp() {
   }
 
   if (status === 'loading') {
-    return <LoadingScreen message="Checking your secure session..." />
+    return <LoadingScreen message="Checking your cloud sync session..." />
   }
 
   if (!user) {
@@ -326,7 +371,7 @@ function SecureApp() {
   }
 
   if (bootstrap.status === 'loading') {
-    return <LoadingScreen message="Loading your secure workspace..." />
+    return <LoadingScreen message="Loading your synced workspace..." />
   }
 
   if (bootstrap.status === 'error') {
@@ -335,11 +380,52 @@ function SecureApp() {
 
   return (
     <StoreProvider key={user.id} initialState={bootstrap.state}>
-      <WorkWindowApp user={user} onSignOut={handleSignOut} />
+      <WorkWindowApp cloudSyncEnabled modeLabel="Cloud sync" user={user} onSignOut={handleSignOut} />
     </StoreProvider>
   )
 }
 
+function LocalModeApp({ onShowCloudSetup }) {
+  return (
+    <StoreProvider>
+      <WorkWindowApp modeLabel="Local-first mode" onShowCloudSetup={onShowCloudSetup} />
+    </StoreProvider>
+  )
+}
+
+function PublicLaunchApp() {
+  const [launchMode, setLaunchMode] = useState(() => getStoredLaunchMode())
+
+  const chooseLocal = () => {
+    setStoredLaunchMode(LAUNCH_MODES.local)
+    setLaunchMode(LAUNCH_MODES.local)
+  }
+
+  const chooseCloud = () => {
+    setStoredLaunchMode(LAUNCH_MODES.cloud)
+    setLaunchMode(LAUNCH_MODES.cloud)
+  }
+
+  const showChooser = () => {
+    clearStoredLaunchMode()
+    setLaunchMode(null)
+  }
+
+  if (launchMode === LAUNCH_MODES.local) {
+    return <LocalModeApp onShowCloudSetup={chooseCloud} />
+  }
+
+  if (launchMode === LAUNCH_MODES.cloud) {
+    return <CloudSetupScreen onBack={showChooser} onChooseLocal={chooseLocal} />
+  }
+
+  return <ModeChooserScreen onChooseCloud={chooseCloud} onChooseLocal={chooseLocal} />
+}
+
 export default function App() {
-  return <SecureApp />
+  if (isSupabaseConfigured()) {
+    return <SecureApp />
+  }
+
+  return <PublicLaunchApp />
 }

@@ -11,7 +11,7 @@ export function isSupabaseConfigured() {
 
 export function getSupabaseConfigError() {
   if (isSupabaseConfigured()) return null
-  return 'Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY before deploying.'
+  return 'Cloud sync requires VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.'
 }
 
 export function getSupabaseClient() {

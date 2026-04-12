@@ -7,3 +7,4 @@ workwindow-export.json
 .env
 .env.local
 .env.*.local
+.vercel

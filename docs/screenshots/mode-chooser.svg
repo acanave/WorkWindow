@@ -1,0 +1,43 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="180" y1="120" x2="1420" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#081224"/>
+      <stop offset="1" stop-color="#050914"/>
+    </linearGradient>
+    <linearGradient id="cardGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1A2947"/>
+      <stop offset="1" stop-color="#121D35"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1370" cy="150" r="220" fill="#0F2A3E" opacity="0.25"/>
+  <circle cx="180" cy="760" r="260" fill="#0E2540" opacity="0.18"/>
+
+  <text x="120" y="120" fill="#67E8F9" font-size="24" font-family="Inter, Arial, sans-serif" letter-spacing="10">LAUNCH MODE</text>
+  <text x="120" y="210" fill="#F8FAFC" font-size="72" font-weight="700" font-family="Inter, Arial, sans-serif">WorkWindow</text>
+  <text x="120" y="270" fill="#CBD5E1" font-size="28" font-family="Inter, Arial, sans-serif">
+    Explore the planner locally right away, or wire up hosted sync later.
+  </text>
+
+  <rect x="120" y="340" width="620" height="390" rx="36" fill="url(#cardGlow)" stroke="#1E293B" stroke-width="2"/>
+  <rect x="860" y="340" width="620" height="390" rx="36" fill="url(#cardGlow)" stroke="#1E293B" stroke-width="2"/>
+
+  <text x="170" y="400" fill="#A5F3FC" font-size="22" font-weight="700" font-family="Inter, Arial, sans-serif" letter-spacing="6">LOCAL FIRST</text>
+  <text x="170" y="455" fill="#F8FAFC" font-size="42" font-weight="700" font-family="Inter, Arial, sans-serif">Try the product instantly</text>
+  <text x="170" y="515" fill="#CBD5E1" font-size="24" font-family="Inter, Arial, sans-serif">Run the full planner without infrastructure.</text>
+  <text x="170" y="565" fill="#CBD5E1" font-size="22" font-family="Inter, Arial, sans-serif">• Great for portfolio review and quick evaluation</text>
+  <text x="170" y="610" fill="#CBD5E1" font-size="22" font-family="Inter, Arial, sans-serif">• Local storage, import/export, dependency insights</text>
+  <text x="170" y="655" fill="#CBD5E1" font-size="22" font-family="Inter, Arial, sans-serif">• Same UI, no external services required</text>
+  <rect x="170" y="680" width="220" height="62" rx="20" fill="#67E8F9"/>
+  <text x="204" y="720" fill="#020617" font-size="22" font-weight="700" font-family="Inter, Arial, sans-serif">Open Local Mode</text>
+
+  <text x="910" y="400" fill="#BBF7D0" font-size="22" font-weight="700" font-family="Inter, Arial, sans-serif" letter-spacing="6">CLOUD SYNC</text>
+  <text x="910" y="455" fill="#F8FAFC" font-size="42" font-weight="700" font-family="Inter, Arial, sans-serif">Bring your own backend</text>
+  <text x="910" y="515" fill="#CBD5E1" font-size="24" font-family="Inter, Arial, sans-serif">Add Supabase and deploy when you want hosted sync.</text>
+  <text x="910" y="565" fill="#CBD5E1" font-size="22" font-family="Inter, Arial, sans-serif">• Magic-link auth with user-scoped persistence</text>
+  <text x="910" y="610" fill="#CBD5E1" font-size="22" font-family="Inter, Arial, sans-serif">• Optional Vercel path for multi-device access</text>
+  <text x="910" y="655" fill="#CBD5E1" font-size="22" font-family="Inter, Arial, sans-serif">• Best path for evaluating the architecture</text>
+  <rect x="910" y="680" width="220" height="62" rx="20" fill="#0F172A" stroke="#86EFAC" stroke-width="2"/>
+  <text x="946" y="720" fill="#DCFCE7" font-size="22" font-weight="700" font-family="Inter, Arial, sans-serif">View Cloud Setup</text>
+</svg>
