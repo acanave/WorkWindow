@@ -1,6 +1,10 @@
 # WorkWindow
 
-WorkWindow is a local-first planning app that combines a Kanban board with a month calendar, dependency visibility, and lightweight performance metrics. It was built to feel fast for solo execution while still being capable of optional cloud sync and multi-device access.
+WorkWindow is the planner I wanted after bouncing between too many half-helpful tools. I kept running into the same problem: my to-do list knew what existed, my calendar knew when things were happening, and my Kanban board knew what was moving, but none of them talked to each other in a way that actually helped me get through real work.
+
+So I built one workspace that combines all three. WorkWindow brings together a to-do list mindset, a calendar view, and a Kanban progress tracker so planning feels less like maintaining three separate systems and more like seeing the whole week clearly. It is designed to feel fast, focused, and a little opinionated in the best way: lightweight enough for everyday personal productivity, but structured enough to show dependencies, delivery risk, and momentum at a glance.
+
+Under the hood, it is also a local-first frontend engineering project with an optional upgrade path to authenticated cloud sync and multi-device access.
 
 ![WorkWindow launch modes](docs/screenshots/mode-chooser.svg)
 ![WorkWindow board overview](docs/screenshots/board-overview.svg)
@@ -9,7 +13,7 @@ WorkWindow is a local-first planning app that combines a Kanban board with a mon
 
 This project is meant to showcase:
 
-- product thinking around planning workflows, not just CRUD forms
+- product thinking rooted in a real productivity pain point, not just CRUD forms
 - a local-first architecture that remains useful without infrastructure
 - a clean upgrade path to authenticated cloud sync with Supabase
 - practical frontend engineering with state normalization, tests, and deploy-ready configuration
