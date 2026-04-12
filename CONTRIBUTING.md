@@ -72,8 +72,9 @@ GitHub Actions workflow: `.github/workflows/release.yml`
 
 ## Main branch protection (classic rule)
 
-This repository is currently private and GitHub API returns `HTTP 403` for branch
-protection/rulesets on the active account plan.
+Branch protection capabilities can vary by GitHub plan and repository visibility.
+If GitHub rulesets or API-based protection management are unavailable on your plan,
+configure a classic branch protection rule for `main` directly in the repository settings.
 
 Define a classic branch protection rule for `main` with:
 
