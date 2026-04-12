@@ -55,23 +55,6 @@ Node version resolution:
 Build artifact policy:
 
 - CI uploads `dist` as an artifact only for pushes to `main`.
-- CD promotes that exact artifact as a **release candidate** for repeatable delivery.
-
-## CD workflow
-
-GitHub Actions workflow: `.github/workflows/cd.yml`
-
-Automatic release-candidate promotion:
-
-- Trigger: successful `CI` workflow run for a `push` to `main`
-- Packages immutable CI artifact with checksum
-- Stores candidate bundle as Actions artifact (`rc-<sha>`)
-
-Manual release-candidate promotion:
-
-- Trigger: `workflow_dispatch` with a `ref` input
-- Rebuilds and packages candidate bundle from that ref
-- Intended for controlled recovery/rebuild scenarios
 
 ## Release workflow
 
@@ -83,7 +66,7 @@ GitHub Actions workflow: `.github/workflows/release.yml`
 
 ### Recommended repository setup
 
-1. Keep `main` protection enabled so only reviewed PRs can trigger candidate promotion.
+1. Keep `main` protection enabled so only reviewed PRs can land in the release line.
 2. Use release tags (`vX.Y.Z`) from `main` only.
 3. If manual release dispatch is used, preserve tag naming discipline and changelog notes.
 
