@@ -121,8 +121,8 @@ export function reducer(state, action) {
   }
 }
 
-export function StoreProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, undefined, initializeState)
+export function StoreProvider({ children, initialState }) {
+  const [state, dispatch] = useReducer(reducer, initialState, initializeState)
 
   useEffect(() => {
     saveState(state)
@@ -148,5 +148,9 @@ function clampPoints(points) {
 }
 
 function initializeState() {
+  if (arguments.length > 0 && arguments[0]) {
+    return normalizeState(arguments[0])
+  }
+
   return loadState() || createInitialState()
 }

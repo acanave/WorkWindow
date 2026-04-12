@@ -1,18 +1,26 @@
 export default function TaskCard({
   card,
+  selectedDate,
   risk,
   unresolvedDependencyCount,
   chainDepth,
   hasDependencyCycle,
   onOpen,
+  onMoveCard,
   onLogProgress,
+  onPlanSelectedDate,
 }) {
   const completion = Math.round((card.completed_points / card.estimate_points) * 100)
   const totalPlanned = card.planned_day_blocks.reduce((sum, block) => sum + block.points, 0)
+  const canMoveToDone = card.completed_points >= card.estimate_points
 
   const handleDragStart = (event) => {
     event.dataTransfer.setData('application/workwindow-card-id', card.id)
     event.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleStatusChange = (event) => {
+    onMoveCard(card.id, event.target.value)
   }
 
   return (
@@ -59,7 +67,7 @@ export default function TaskCard({
         {card.due_date && <p>Due {card.due_date}</p>}
       </div>
 
-      <div className="mt-3 flex items-center gap-2" onClick={(event) => event.stopPropagation()}>
+      <div className="mt-3 flex flex-wrap items-center gap-2" onClick={(event) => event.stopPropagation()}>
         <button
           onClick={() => onLogProgress(card.id, -1)}
           className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-100"
@@ -72,6 +80,28 @@ export default function TaskCard({
         >
           +1
         </button>
+        <button
+          onClick={() => onPlanSelectedDate(card.id)}
+          className="rounded border border-cyan-300 bg-cyan-50 px-2 py-1 text-xs font-medium text-cyan-900 hover:bg-cyan-100"
+        >
+          Plan to {selectedDate}
+        </button>
+        <label className="sr-only" htmlFor={`status-${card.id}`}>
+          Move {card.title}
+        </label>
+        <select
+          id={`status-${card.id}`}
+          value={card.status}
+          onChange={handleStatusChange}
+          className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-700"
+        >
+          <option value="Backlog">Backlog</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Blocked">Blocked</option>
+          <option value="Done" disabled={!canMoveToDone}>
+            Done
+          </option>
+        </select>
       </div>
     </article>
   )
