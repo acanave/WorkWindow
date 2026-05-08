@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import MonthCalendar from './MonthCalendar'
+import MonthCalendar, { getWindowStackPadding, packWindowSegmentsIntoRows } from './MonthCalendar'
 import { monthLabel, parseDateKey } from '../../utils/date'
 
 function makeProps(selectedDate) {
@@ -127,5 +127,25 @@ describe('MonthCalendar', () => {
     })
 
     promptSpy.mockRestore()
+  })
+
+  it('packs overlapping work window spans into separate visual rows', () => {
+    const rows = packWindowSegmentsIntoRows([
+      { id: 'a', title: 'Alpha', startColumn: 0, endColumn: 2 },
+      { id: 'b', title: 'Beta', startColumn: 1, endColumn: 3 },
+      { id: 'c', title: 'Gamma', startColumn: 4, endColumn: 5 },
+      { id: 'd', title: 'Delta', startColumn: 6, endColumn: 6 },
+    ])
+
+    expect(rows).toHaveLength(2)
+    expect(rows[0].map((segment) => segment.id)).toEqual(['a', 'c', 'd'])
+    expect(rows[1].map((segment) => segment.id)).toEqual(['b'])
+  })
+
+  it('reserves enough vertical space for stacked window rows', () => {
+    expect(getWindowStackPadding(0)).toBe(0)
+    expect(getWindowStackPadding(1)).toBe(0)
+    expect(getWindowStackPadding(2)).toBe(4)
+    expect(getWindowStackPadding(3)).toBe(40)
   })
 })

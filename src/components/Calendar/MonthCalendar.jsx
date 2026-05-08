@@ -4,6 +4,12 @@ import { addMonths, formatDateKey, getMonthGrid, monthLabel, parseDateKey } from
 import DayCell from './DayCell'
 import AgendaStrip from './AgendaStrip'
 
+const WINDOW_ROW_HEIGHT = 34
+const WINDOW_ROW_GAP = 2
+const WINDOW_STACK_TOP = 58
+const DAY_CELL_HEIGHT = 124
+const WINDOW_STACK_AVAILABLE_HEIGHT = DAY_CELL_HEIGHT - WINDOW_STACK_TOP
+
 export default function MonthCalendar({
   cards,
   riskByCardId = {},
@@ -38,11 +44,11 @@ export default function MonthCalendar({
   const monthDays = useMemo(() => getMonthGrid(cursor), [cursor])
   const weeks = useMemo(() => chunkWeeks(monthDays), [monthDays])
 
-  const { anchorsByDate, blocksByDate, cardMetaById, windowSegmentsByWeek } = useMemo(() => {
+  const { anchorsByDate, blocksByDate, cardMetaById, windowRowsByWeek } = useMemo(() => {
     const anchors = {}
     const blocks = {}
     const metaById = {}
-    const segmentsByWeek = {}
+    const rowsByWeek = {}
 
     cards.forEach((card) => {
       if (!visibleStatuses.includes(card.status)) return
@@ -70,14 +76,14 @@ export default function MonthCalendar({
     })
 
     weeks.forEach((week, weekIndex) => {
-      segmentsByWeek[weekIndex] = buildWeekWindowSegments(cards, week, visibleStatuses, metaById)
+      rowsByWeek[weekIndex] = buildWeekWindowRows(cards, week, visibleStatuses, metaById)
     })
 
     return {
       anchorsByDate: anchors,
       blocksByDate: blocks,
       cardMetaById: metaById,
-      windowSegmentsByWeek: segmentsByWeek,
+      windowRowsByWeek: rowsByWeek,
     }
   }, [cards, visibleStatuses, weeks])
 
@@ -181,7 +187,13 @@ export default function MonthCalendar({
 
           <div>
             {weeks.map((week, weekIndex) => (
-              <div key={week[0].dateKey} className="relative grid grid-cols-7">
+              <div
+                key={week[0].dateKey}
+                className="relative grid grid-cols-7"
+                style={{
+                  paddingBottom: `${getWindowStackPadding(windowRowsByWeek[weekIndex]?.length || 0)}px`,
+                }}
+              >
                 {week.map((day) => (
                   <DayCell
                     key={day.dateKey}
@@ -199,9 +211,17 @@ export default function MonthCalendar({
                     onDropCard={onDropCard}
                   />
                 ))}
-                <div className="pointer-events-none absolute inset-x-0 top-[58px] z-20 grid grid-cols-7 gap-0 px-3">
-                  {(windowSegmentsByWeek[weekIndex] || []).map((segment, rowIndex) => (
-                    <WindowSpan key={segment.id} segment={segment} rowIndex={rowIndex} onOpenCard={onOpenCard} />
+                <div className="pointer-events-none absolute inset-x-0 top-[58px] z-20 flex flex-col px-3">
+                  {(windowRowsByWeek[weekIndex] || []).map((row, rowIndex) => (
+                    <div
+                      key={rowIndex}
+                      className="grid grid-cols-7 gap-0"
+                      style={{ marginTop: rowIndex === 0 ? 0 : `${WINDOW_ROW_GAP}px` }}
+                    >
+                      {row.map((segment) => (
+                        <WindowSpan key={segment.id} segment={segment} onOpenCard={onOpenCard} />
+                      ))}
+                    </div>
                   ))}
                 </div>
               </div>
@@ -252,7 +272,7 @@ function CalendarLegend() {
   )
 }
 
-function WindowSpan({ segment, rowIndex, onOpenCard }) {
+function WindowSpan({ segment, onOpenCard }) {
   return (
     <button
       type="button"
@@ -266,7 +286,6 @@ function WindowSpan({ segment, rowIndex, onOpenCard }) {
       }`}
       style={{
         gridColumn: `${segment.startColumn + 1} / ${segment.endColumn + 2}`,
-        marginTop: `${rowIndex * 34}px`,
       }}
       title={`Work window: ${segment.title} • ${segment.points}pt • ${segment.startDate} to ${segment.endDate}`}
     >
@@ -280,11 +299,11 @@ function chunkWeeks(days) {
   return Array.from({ length: Math.ceil(days.length / 7) }, (_, index) => days.slice(index * 7, index * 7 + 7))
 }
 
-function buildWeekWindowSegments(cards, week, visibleStatuses, cardMetaById) {
+function buildWeekWindowRows(cards, week, visibleStatuses, cardMetaById) {
   const weekDateSet = new Set(week.map((day) => day.dateKey))
   const columnByDate = Object.fromEntries(week.map((day, index) => [day.dateKey, index]))
 
-  return cards
+  const segments = cards
     .filter((card) => visibleStatuses.includes(card.status))
     .map((card) => {
       const blocks = card.planned_day_blocks.filter((block) => weekDateSet.has(block.date))
@@ -304,6 +323,39 @@ function buildWeekWindowSegments(cards, week, visibleStatuses, cardMetaById) {
       }
     })
     .filter(Boolean)
+
+  return packWindowSegmentsIntoRows(segments)
+}
+
+export function packWindowSegmentsIntoRows(segments) {
+  const sortedSegments = [...segments].sort(
+    (a, b) => a.startColumn - b.startColumn || a.endColumn - b.endColumn || a.title.localeCompare(b.title),
+  )
+
+  const rows = []
+  const rowEndColumns = []
+
+  sortedSegments.forEach((segment) => {
+    const rowIndex = rowEndColumns.findIndex((endColumn) => segment.startColumn > endColumn)
+
+    if (rowIndex === -1) {
+      rowEndColumns.push(segment.endColumn)
+      rows.push([segment])
+      return
+    }
+
+    rowEndColumns[rowIndex] = segment.endColumn
+    rows[rowIndex].push(segment)
+  })
+
+  return rows
+}
+
+export function getWindowStackPadding(rowCount) {
+  if (rowCount <= 0) return 0
+
+  const stackHeight = rowCount * WINDOW_ROW_HEIGHT + Math.max(0, rowCount - 1) * WINDOW_ROW_GAP
+  return Math.max(0, stackHeight - WINDOW_STACK_AVAILABLE_HEIGHT)
 }
 
 function normalizeRange(startDate, endDate) {
