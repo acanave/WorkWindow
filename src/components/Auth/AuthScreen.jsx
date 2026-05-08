@@ -38,11 +38,11 @@ export default function AuthScreen({ errorMessage }) {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100">
-      <section className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40">
+    <main className="flex min-h-screen items-center justify-center bg-[#0f1421] px-4 py-10 text-[#edf4ff]">
+      <section className="w-full max-w-md rounded-2xl border border-[#2b384d] bg-[#172031] p-6 shadow-2xl shadow-slate-950/25">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">Secure Sync</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">WorkWindow</h1>
-        <p className="mt-3 text-sm leading-6 text-slate-300">
+        <p className="mt-3 text-sm leading-6 text-[#c8d3e3]">
           Sign in with a magic link to sync your workspace across devices using your own Supabase project.
         </p>
 
@@ -59,14 +59,14 @@ export default function AuthScreen({ errorMessage }) {
         {!configError && (
           <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
             <label className="block text-sm">
-              <span className="mb-2 block text-slate-300">Email</span>
+              <span className="mb-2 block text-[#c8d3e3]">Email</span>
               <input
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400"
+                className="w-full rounded-xl border border-[#2b384d] bg-[#111a2a] px-4 py-3 text-[#edf4ff] outline-none transition focus:border-cyan-400"
               />
             </label>
             <button
@@ -80,7 +80,7 @@ export default function AuthScreen({ errorMessage }) {
         )}
 
         {(errorMessage || notice) && (
-          <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4 text-sm text-slate-300">
+          <div className="mt-4 rounded-xl border border-[#2b384d] bg-[#111a2a] p-4 text-sm text-[#c8d3e3]">
             {errorMessage || notice}
           </div>
         )}

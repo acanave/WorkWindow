@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import CardModal from './CardModal'
 
@@ -35,5 +36,43 @@ describe('CardModal', () => {
 
     expect(screen.getByRole('heading', { name: 'Blocked by' })).toBeInTheDocument()
     expect(screen.getByText('Task B (Blocked)')).toBeInTheDocument()
+  })
+
+  it('saves a manual cross-day work window from range fields', async () => {
+    const user = userEvent.setup()
+    const onUpdate = vi.fn()
+
+    render(
+      <CardModal
+        mode="edit"
+        card={makeCard({ dependencies: [] })}
+        allCards={[makeCard({ dependencies: [] })]}
+        blockedBy={[]}
+        onClose={vi.fn()}
+        onCreate={vi.fn()}
+        onUpdate={onUpdate}
+        onDelete={vi.fn()}
+        onLogProgress={vi.fn()}
+      />,
+    )
+
+    await user.type(screen.getByLabelText('Start'), '2026-05-11')
+    await user.type(screen.getByLabelText('End'), '2026-05-14')
+    await user.clear(screen.getByLabelText('Pts/day'))
+    await user.type(screen.getByLabelText('Pts/day'), '2')
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(onUpdate).toHaveBeenCalledWith(
+      'c1',
+      expect.objectContaining({
+        due_date: '2026-05-14',
+        planned_day_blocks: [
+          { date: '2026-05-11', points: 2 },
+          { date: '2026-05-12', points: 2 },
+          { date: '2026-05-13', points: 2 },
+          { date: '2026-05-14', points: 2 },
+        ],
+      }),
+    )
   })
 })

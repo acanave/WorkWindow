@@ -12,10 +12,10 @@ export default function PerformancePanel({ snapshot }) {
       : `${snapshot.totals.planned}/${snapshot.totals.remaining} pts`
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-3">
+    <section className="rounded-lg border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-3">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-900">Performance</h2>
-        <span className="text-xs text-slate-500">Burnup and velocity snapshot</span>
+        <h2 className="text-sm font-semibold text-[color:var(--ww-heading)]">Performance</h2>
+        <span className="text-xs text-[color:var(--ww-muted)]">Burnup and velocity snapshot</span>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -63,11 +63,11 @@ function MetricTile({ label, value, detail, percent, tone }) {
   }
 
   return (
-    <article className="rounded border border-slate-200 p-2">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
-      <p className="text-xs text-slate-600">{detail}</p>
-      <div className="mt-2 h-1.5 rounded bg-slate-100">
+    <article className="rounded border border-[color:var(--ww-border-soft)] bg-[color:var(--ww-soft-panel-bg)] p-2">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ww-muted)]">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-[color:var(--ww-heading)]">{value}</p>
+      <p className="text-xs text-[color:var(--ww-muted)]">{detail}</p>
+      <div className="mt-2 h-1.5 rounded bg-[color:var(--ww-panel-bg)]">
         <div className={`h-1.5 rounded ${styles[tone]}`} style={{ width: `${clampPercent(percent)}%` }} />
       </div>
     </article>

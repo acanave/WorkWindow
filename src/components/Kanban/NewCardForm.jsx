@@ -13,18 +13,19 @@ export default function NewCardForm({ onSubmit, compact = false }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className={compact ? 'space-y-2' : 'mb-3 rounded-md border border-slate-300 bg-white p-2'}
+      className={
+        compact
+          ? 'space-y-2'
+          : 'mb-3 rounded-md border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-2'
+      }
     >
       <input
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         placeholder="Quick add work item..."
-        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
+        className="ww-input w-full px-3 py-2 text-sm"
       />
-      <button
-        type="submit"
-        className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-      >
+      <button type="submit" className="ww-button ww-button-primary w-full px-3 py-2 text-sm font-semibold">
         Add work item
       </button>
     </form>

@@ -28,15 +28,15 @@ export default function KanbanColumn({
     <section
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      className="border-b border-slate-200 px-4 py-4 last:border-b-0"
+      className="border-b border-[color:var(--ww-border-soft)] px-4 py-4 last:border-b-0"
     >
       <div className="mb-4 flex items-center gap-4">
         <span className={`h-3.5 w-3.5 rounded-full ${getStatusDot(status)}`} />
-        <h3 className={`text-base font-bold ${getStatusText(status)}`}>{status}</h3>
-        <span className="text-sm text-slate-500">
+        <h3 className={`text-base font-semibold ${getStatusText(status)}`}>{status}</h3>
+        <span className="text-sm text-[color:var(--ww-muted)]">
           {cards.length} card{cards.length === 1 ? '' : 's'}
         </span>
-        <span className="flex items-center gap-1 text-sm text-slate-500">{sumCards(cards)}pt</span>
+        <span className="flex items-center gap-1 text-sm text-[color:var(--ww-muted)]">{sumCards(cards)}pt</span>
       </div>
       <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
         {cards.map((card) => (
@@ -55,7 +55,7 @@ export default function KanbanColumn({
           />
         ))}
         {cards.length === 0 && (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+          <div className="rounded-xl border border-dashed border-[color:var(--ww-border)] bg-[color:var(--ww-soft-panel-bg)] px-4 py-8 text-center text-sm text-[color:var(--ww-muted)]">
             Move cards here to change status.
           </div>
         )}
@@ -71,15 +71,15 @@ function sumCards(cards) {
 }
 
 function getStatusDot(status) {
-  if (status === 'In Progress') return 'bg-blue-600'
-  if (status === 'Blocked') return 'bg-fuchsia-500'
-  if (status === 'Done') return 'bg-emerald-500'
+  if (status === 'In Progress') return 'bg-blue-300'
+  if (status === 'Blocked') return 'bg-fuchsia-300'
+  if (status === 'Done') return 'bg-emerald-300'
   return 'bg-slate-300'
 }
 
 function getStatusText(status) {
-  if (status === 'In Progress') return 'text-blue-700'
-  if (status === 'Blocked') return 'text-fuchsia-700'
-  if (status === 'Done') return 'text-emerald-700'
-  return 'text-slate-700'
+  if (status === 'In Progress') return 'text-blue-800 dark:text-blue-300'
+  if (status === 'Blocked') return 'text-fuchsia-800 dark:text-fuchsia-300'
+  if (status === 'Done') return 'text-emerald-800 dark:text-emerald-300'
+  return 'text-[color:var(--ww-heading)]'
 }

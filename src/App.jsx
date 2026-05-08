@@ -123,6 +123,18 @@ function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, 
     addDayBlock(cardId, state.ui.selectedDate)
   }
 
+  const createCardFromWindowRange = ({ startDate, endDate, title }) => {
+    const planned_day_blocks = buildDayBlocksForRange(startDate, endDate, 1)
+    createCard({
+      title,
+      due_date: endDate,
+      estimate_points: planned_day_blocks.length,
+      planned_day_blocks,
+      status: 'Backlog',
+    })
+    setSelectedDate(endDate)
+  }
+
   const updateDayBlock = (cardId, blockId, points) => {
     dispatch({ type: 'DAY_BLOCK_UPDATE', payload: { cardId, blockId, points } })
   }
@@ -149,8 +161,8 @@ function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, 
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 p-3 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1760px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+    <div className="min-h-screen p-3 text-[color:var(--ww-text)] [background:var(--ww-app-bg)]">
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1760px] overflow-hidden rounded-2xl border border-[color:var(--ww-border)] [background:var(--ww-shell-bg)] shadow-sm">
         <AppHeader
           activeView={activeView}
           onChangeView={setActiveView}
@@ -169,16 +181,16 @@ function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, 
         <main className="min-w-0 flex-1 px-4 py-5 md:px-7">
           <section className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-normal text-slate-950 md:text-[28px]">
+              <h1 className="ww-page-title max-w-5xl text-2xl font-semibold leading-tight tracking-normal md:text-[29px]">
                 {activeView === 'calendar' ? (
                   <>
-                    See not just what is scheduled. See <span className="text-blue-600">what it takes</span> to make it
-                    happen.
+                    See not just what is scheduled. See <span className="ww-title-accent">what it takes</span> to make
+                    it happen.
                   </>
                 ) : (
                   <>
                     Plan with clarity. Execute with confidence.{' '}
-                    <span className="text-blue-600">Cards that drive results.</span>
+                    <span className="ww-title-accent">Cards that drive results.</span>
                   </>
                 )}
               </h1>
@@ -192,6 +204,8 @@ function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, 
               selectedDate={state.ui.selectedDate}
               onSelectDate={setSelectedDate}
               onDropCard={addDayBlock}
+              onCreateCardFromWindowRange={createCardFromWindowRange}
+              onOpenCard={openEdit}
               onUpdateBlock={updateDayBlock}
               onDeleteBlock={deleteDayBlock}
             />
@@ -232,12 +246,27 @@ function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, 
   )
 }
 
+function buildDayBlocksForRange(startDate, endDate, points) {
+  const start = startDate <= endDate ? startDate : endDate
+  const end = startDate <= endDate ? endDate : startDate
+  const blocks = []
+  let cursor = new Date(`${start}T00:00:00`)
+  const last = new Date(`${end}T00:00:00`)
+
+  while (cursor <= last) {
+    blocks.push({ date: cursor.toISOString().slice(0, 10), points })
+    cursor.setDate(cursor.getDate() + 1)
+  }
+
+  return blocks
+}
+
 function LoadingScreen({ message }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 text-center shadow-2xl shadow-slate-950/40">
+    <main className="flex min-h-screen items-center justify-center bg-[#0f1421] px-4 py-10 text-[#c8d3e3]">
+      <div className="w-full max-w-md rounded-2xl border border-[#2b384d] bg-[#172031] p-6 text-center shadow-2xl shadow-slate-950/25">
         <h1 className="text-2xl font-semibold tracking-tight">WorkWindow</h1>
-        <p className="mt-3 text-sm text-slate-300">{message}</p>
+        <p className="mt-3 text-sm text-[#8795aa]">{message}</p>
       </div>
     </main>
   )
