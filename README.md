@@ -2,9 +2,9 @@
 
 WorkWindow is the planner I wanted after bouncing between too many half-helpful tools. I kept running into the same problem: my to-do list knew what existed, my calendar knew when things were happening, and my Kanban board knew what was moving, but none of them talked to each other in a way that actually helped me get through real work.
 
-So I built one workspace that combines all three. WorkWindow brings together a to-do list mindset, a calendar view, and a Kanban progress tracker around one core idea: every task or event has a work window, the real block of time needed to make that obligation possible before its deadline. Travel, preparation, focused execution, setup, and buffer all belong in that footprint.
+So I built one workspace that combines all three. WorkWindow brings together a to-do list mindset, a calendar view, and a Kanban progress tracker so planning feels less like maintaining three separate systems and more like seeing the whole week clearly. It is designed to feel fast, focused, and a little opinionated in the best way: lightweight enough for everyday personal productivity, but structured enough to show dependencies, delivery risk, and momentum at a glance.
 
-The calendar is meant to show both sides of the commitment: the anchor task or event, and the supporting work windows visually tied to it. That makes the schedule less about what is merely due, and more about what it actually takes to get there.
+The calendar is meant to show both sides of a commitment: the anchor task or event, and the supporting work windows visually tied to it. Travel, preparation, focused execution, setup, and buffer all belong in that footprint, so the schedule shows what it actually takes to get work done.
 
 Under the hood, it is also a local-first frontend engineering project with an optional upgrade path to authenticated cloud sync and multi-device access.
 
