@@ -17,7 +17,7 @@ export default function DayChip({ block, cardTitle, accent, onUpdate, onDelete }
     return (
       <div
         onClick={(event) => event.stopPropagation()}
-        className={`rounded border border-l-4 border-slate-300 bg-white p-1 text-xs shadow ${
+        className={`rounded border border-l-4 border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-1 text-xs shadow-sm ${
           accent?.agenda || 'border-l-slate-500'
         }`}
       >
@@ -28,14 +28,17 @@ export default function DayChip({ block, cardTitle, accent, onUpdate, onDelete }
             max={8}
             value={points}
             onChange={(event) => setPoints(event.target.value)}
-            className="w-12 rounded border border-slate-300 px-1 py-0.5"
+            className="ww-input w-12 px-1 py-0.5"
           />
-          <button onClick={save} className="rounded bg-slate-900 px-1.5 py-0.5 text-white">
+          <button
+            onClick={save}
+            className="rounded border border-blue-200 bg-blue-100 px-1.5 py-0.5 text-blue-800 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-100"
+          >
             Save
           </button>
           <button
             onClick={() => onDelete(block.cardId, block.id)}
-            className="rounded border border-slate-300 px-1.5 py-0.5"
+            className="rounded border border-[color:var(--ww-border)] px-1.5 py-0.5 text-[color:var(--ww-muted)]"
           >
             Delete
           </button>
@@ -51,7 +54,8 @@ export default function DayChip({ block, cardTitle, accent, onUpdate, onDelete }
         setEditing(true)
       }}
       className={`w-full truncate rounded-lg border border-l-4 px-2 py-2 text-left text-[11px] font-medium ${
-        accent?.workWindow || 'border-l-slate-900 bg-slate-900 text-white hover:bg-slate-700'
+        accent?.workWindow ||
+        'border-l-blue-400 bg-blue-50 text-blue-900 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-100 dark:hover:bg-blue-900/60'
       }`}
       title={`Work window: ${cardTitle} • ${block.points}pt`}
     >

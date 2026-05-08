@@ -51,25 +51,23 @@ export default function KanbanBoard({
 
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_254px]">
-      <section className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <div className="flex flex-col gap-3 border-b border-slate-200 p-4 xl:flex-row xl:items-center xl:justify-between">
+      <section className="min-w-0 overflow-hidden rounded-xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)]">
+        <div className="flex flex-col gap-3 border-b border-[color:var(--ww-border-soft)] p-4 [background:var(--ww-soft-panel-bg)] xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-1 flex-col gap-3 lg:flex-row">
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search title or description..."
               aria-label="Search cards"
-              className="min-w-[220px] flex-1 rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+              className="ww-input min-w-[220px] flex-1 px-4 py-3 text-sm"
             />
             <div className="flex flex-wrap items-center gap-2">
-              <button className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
-                Filter
-              </button>
+              <button className="ww-button px-4 py-3 text-sm">Filter</button>
               <select
                 value={sortBy}
                 onChange={(event) => setSortBy(event.target.value)}
                 aria-label="Sprint window"
-                className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700"
+                className="ww-button px-4 py-3 text-sm"
               >
                 <option value="manual">Sprint: Created order</option>
                 <option value="due_asc">Sort: Due date (earliest first)</option>
@@ -83,25 +81,19 @@ export default function KanbanBoard({
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value)}
               aria-label="Sort cards"
-              className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700"
+              className="ww-button px-4 py-3 text-sm"
             >
               <option value="manual">Sort</option>
               <option value="due_asc">Due date</option>
               <option value="due_desc">Latest due</option>
               <option value="progress_desc">Progress</option>
             </select>
-            <button className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
-              Group
-            </button>
-            <button className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
-              View
-            </button>
-            <button className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
-              ...
-            </button>
+            <button className="ww-button px-4 py-3 text-sm">Group</button>
+            <button className="ww-button px-4 py-3 text-sm">View</button>
+            <button className="ww-button px-4 py-3 text-sm">...</button>
           </div>
         </div>
-        <div className="flex flex-wrap gap-1 border-b border-slate-100 px-4 py-3">
+        <div className="flex flex-wrap gap-1 border-b border-[color:var(--ww-border-soft)] px-4 py-3">
           {STATUSES.map((status) => {
             const active = visibleStatuses.includes(status)
             return (
@@ -110,7 +102,9 @@ export default function KanbanBoard({
                 type="button"
                 onClick={() => toggleStatus(status)}
                 className={`rounded-md px-3 py-1.5 text-xs font-medium ${
-                  active ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                  active
+                    ? 'bg-[color:var(--ww-accent-soft)] text-[color:var(--ww-accent)]'
+                    : 'bg-[color:var(--ww-soft-panel-bg)] text-[color:var(--ww-muted)] hover:bg-[color:var(--ww-accent-soft)]'
                 }`}
               >
                 {status}
@@ -190,21 +184,21 @@ function CardsSidePanel({ cards, selectedDate, snapshot, dependencyInsights, onC
 
   return (
     <aside className="space-y-3">
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h3 className="text-base font-bold text-slate-950">Sprint Progress</h3>
-        <p className="mt-1 text-sm text-slate-500">Selected day {selectedDate}</p>
+      <section className="rounded-xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-4">
+        <h3 className="text-base font-semibold text-[color:var(--ww-heading)]">Sprint Progress</h3>
+        <p className="mt-1 text-sm text-[color:var(--ww-muted)]">Selected day {selectedDate}</p>
         <div className="mt-5 flex items-center gap-4">
           <div
-            className="flex h-20 w-20 items-center justify-center rounded-full border-[8px] border-emerald-500 text-lg font-bold text-slate-800"
-            style={{ borderLeftColor: '#e2e8f0' }}
+            className="flex h-20 w-20 items-center justify-center rounded-full border-[8px] border-emerald-300 text-lg font-semibold text-[color:var(--ww-heading)]"
+            style={{ borderLeftColor: 'var(--ww-border-soft)' }}
           >
             {progressPct}%
           </div>
           <div>
-            <p className="text-xl font-bold text-slate-950">
+            <p className="text-xl font-semibold text-[color:var(--ww-heading)]">
               {planned} / {estimate}pt
             </p>
-            <p className="text-sm text-slate-500">planned effort</p>
+            <p className="text-sm text-[color:var(--ww-muted)]">planned effort</p>
           </div>
         </div>
         <div className="mt-5 grid grid-cols-3 gap-2 text-center">
@@ -214,27 +208,27 @@ function CardsSidePanel({ cards, selectedDate, snapshot, dependencyInsights, onC
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h3 className="text-base font-bold text-slate-950">Workload Summary</h3>
+      <section className="rounded-xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-4">
+        <h3 className="text-base font-semibold text-[color:var(--ww-heading)]">Workload Summary</h3>
         <div className="mt-4 space-y-3 text-sm">
           <SummaryRow color="bg-slate-400" label="Backlog" value={sumStatus(cards, 'Backlog')} />
-          <SummaryRow color="bg-blue-600" label="In Progress" value={sumStatus(cards, 'In Progress')} />
+          <SummaryRow color="bg-blue-300" label="In Progress" value={sumStatus(cards, 'In Progress')} />
           <SummaryRow color="bg-fuchsia-500" label="Blocked" value={sumStatus(cards, 'Blocked')} />
           <SummaryRow color="bg-emerald-500" label="Completed" value={sumStatus(cards, 'Done')} />
         </div>
         {cycleCount > 0 && <p className="mt-4 text-xs font-medium text-rose-600">{cycleCount} dependency cycle risk</p>}
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h3 className="text-base font-bold text-slate-950">Dependencies</h3>
+      <section className="rounded-xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-4">
+        <h3 className="text-base font-semibold text-[color:var(--ww-heading)]">Dependencies</h3>
         <div className="mt-3 space-y-2">
-          {blockedCards.length === 0 && <p className="text-sm text-slate-500">No unresolved blockers.</p>}
+          {blockedCards.length === 0 && <p className="text-sm text-[color:var(--ww-muted)]">No unresolved blockers.</p>}
           {blockedCards.slice(0, 4).map((card) => (
             <button
               key={card.id}
               type="button"
               onClick={() => onOpenCard(card.id)}
-              className="w-full rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-left text-sm text-amber-900"
+              className="w-full rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-left text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-100"
             >
               <span className="font-semibold">{card.title}</span>
               <span className="ml-2 text-xs">{dependencyInsights.unresolvedCountByCardId[card.id]} blocker(s)</span>
@@ -243,8 +237,8 @@ function CardsSidePanel({ cards, selectedDate, snapshot, dependencyInsights, onC
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h3 className="text-base font-bold text-slate-950">Quick Actions</h3>
+      <section className="rounded-xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-4">
+        <h3 className="text-base font-semibold text-[color:var(--ww-heading)]">Quick Actions</h3>
         <div className="mt-3">
           <NewCardForm onSubmit={onCreateCard} compact />
         </div>
@@ -256,8 +250,8 @@ function CardsSidePanel({ cards, selectedDate, snapshot, dependencyInsights, onC
 function MiniStat({ label, value }) {
   return (
     <div>
-      <p className="text-lg font-bold text-slate-950">{value}</p>
-      <p className="text-xs text-slate-500">{label}</p>
+      <p className="text-lg font-semibold text-[color:var(--ww-heading)]">{value}</p>
+      <p className="text-xs text-[color:var(--ww-muted)]">{label}</p>
     </div>
   )
 }
@@ -265,11 +259,11 @@ function MiniStat({ label, value }) {
 function SummaryRow({ color, label, value }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="flex items-center gap-2 text-slate-600">
+      <span className="flex items-center gap-2 text-[color:var(--ww-muted)]">
         <span className={`h-4 w-1.5 rounded-full ${color}`} />
         {label}
       </span>
-      <span className="font-bold text-slate-950">{value}pt</span>
+      <span className="font-semibold text-[color:var(--ww-heading)]">{value}pt</span>
     </div>
   )
 }
@@ -280,13 +274,13 @@ function CardLegend({ cards }) {
   }, 0)
 
   return (
-    <div className="flex flex-wrap items-center gap-6 border-t border-slate-200 px-4 py-4 text-sm text-slate-600">
+    <div className="flex flex-wrap items-center gap-6 border-t border-[color:var(--ww-border-soft)] bg-[color:var(--ww-soft-panel-bg)] px-4 py-4 text-sm text-[color:var(--ww-muted)]">
       <span className="font-medium text-blue-700">Travel</span>
       <span className="font-medium text-blue-700">Prep</span>
       <span className="font-medium text-fuchsia-700">Focus</span>
       <span className="font-medium text-purple-700">Setup</span>
-      <span className="font-medium text-slate-700">Buffer</span>
-      <span className="ml-auto font-bold text-slate-700">Total Effort {total}pt</span>
+      <span className="font-medium text-[color:var(--ww-text)]">Buffer</span>
+      <span className="ml-auto font-bold text-[color:var(--ww-heading)]">Total Effort {total}pt</span>
     </div>
   )
 }

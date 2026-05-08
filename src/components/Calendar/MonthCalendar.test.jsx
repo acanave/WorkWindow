@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import MonthCalendar from './MonthCalendar'
@@ -105,5 +105,27 @@ describe('MonthCalendar', () => {
     )
 
     expect(screen.getByText('Short 3pt')).toBeInTheDocument()
+  })
+
+  it('creates a new card window by dragging across calendar days', () => {
+    const onCreateCardFromWindowRange = vi.fn()
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('Dragged window task')
+
+    render(<MonthCalendar {...makeProps('2026-03-10')} onCreateCardFromWindowRange={onCreateCardFromWindowRange} />)
+
+    const startDay = screen.getAllByText('10')[0].closest('[role="button"]')
+    const endDay = screen.getAllByText('12')[0].closest('[role="button"]')
+
+    fireEvent.mouseDown(startDay)
+    fireEvent.mouseEnter(endDay)
+    fireEvent.mouseUp(endDay)
+
+    expect(onCreateCardFromWindowRange).toHaveBeenCalledWith({
+      startDate: '2026-03-10',
+      endDate: '2026-03-12',
+      title: 'Dragged window task',
+    })
+
+    promptSpy.mockRestore()
   })
 })

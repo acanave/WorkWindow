@@ -7,12 +7,12 @@ const SYNC_STATUS_LABELS = {
 }
 
 const NAV_ITEMS = [
-  { id: 'calendar', label: 'Calendar', icon: 'Cal' },
-  { id: 'timeline', label: 'Timeline', icon: 'Line', disabled: true },
-  { id: 'cards', label: 'Cards', icon: 'Grid' },
-  { id: 'workloads', label: 'Workloads', icon: 'Load', disabled: true },
-  { id: 'projects', label: 'Projects', icon: 'Proj', disabled: true },
-  { id: 'insights', label: 'Insights', icon: 'Bars', disabled: true },
+  { id: 'calendar', label: 'Calendar', icon: 'calendar' },
+  { id: 'timeline', label: 'Timeline', icon: 'timeline', disabled: true },
+  { id: 'cards', label: 'Cards', icon: 'cards' },
+  { id: 'workloads', label: 'Workloads', icon: 'workloads', disabled: true },
+  { id: 'projects', label: 'Projects', icon: 'projects', disabled: true },
+  { id: 'insights', label: 'Insights', icon: 'insights', disabled: true },
 ]
 
 export default function AppHeader({
@@ -45,10 +45,10 @@ export default function AppHeader({
   }
 
   return (
-    <aside className="flex w-[224px] shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-5">
+    <aside className="flex w-[224px] shrink-0 flex-col border-r border-[color:var(--ww-border)] px-4 py-5 [background:var(--ww-soft-panel-bg)]">
       <div className="mb-8 flex items-center gap-3 px-1">
         <BrandMark />
-        <span className="text-xl font-bold tracking-normal text-slate-950">WorkWindow</span>
+        <span className="text-xl font-semibold tracking-normal text-[color:var(--ww-heading)]">WorkWindow</span>
       </div>
 
       <nav className="space-y-1">
@@ -62,18 +62,20 @@ export default function AppHeader({
               onClick={() => onChangeView?.(item.id)}
               className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition ${
                 active
-                  ? 'bg-blue-50 text-blue-700'
+                  ? 'border border-[color:var(--ww-accent-border)] bg-[color:var(--ww-accent-soft)] text-[color:var(--ww-accent)]'
                   : item.disabled
                     ? 'cursor-not-allowed text-slate-400'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
+                    : 'border border-transparent text-[color:var(--ww-muted)] hover:border-[color:var(--ww-border-soft)] hover:bg-[color:var(--ww-panel-bg)] hover:text-[color:var(--ww-heading)]'
               }`}
             >
               <span
                 className={`flex h-6 w-6 items-center justify-center rounded-md border text-[10px] ${
-                  active ? 'border-blue-200 bg-white text-blue-700' : 'border-slate-200 bg-white text-slate-500'
+                  active
+                    ? 'border-[color:var(--ww-accent-border)] bg-[color:var(--ww-panel-bg)] text-[color:var(--ww-accent)]'
+                    : 'border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] text-[color:var(--ww-muted)]'
                 }`}
               >
-                {item.icon}
+                <NavIcon name={item.icon} />
               </span>
               {item.label}
             </button>
@@ -81,11 +83,11 @@ export default function AppHeader({
         })}
       </nav>
 
-      <div className="mt-7 border-t border-slate-200 pt-5">
+      <div className="mt-7 border-t border-[color:var(--ww-border)] pt-5">
         <button
           type="button"
           onClick={onNewCard}
-          className="w-full rounded-lg bg-blue-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+          className="ww-button ww-button-primary w-full px-3 py-2.5 text-sm font-semibold"
         >
           New Work Item
         </button>
@@ -93,29 +95,27 @@ export default function AppHeader({
           <button
             type="button"
             onClick={handlePickFile}
-            className="rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+            className="ww-button px-2 py-2 text-xs text-[color:var(--ww-muted)]"
           >
             Import
           </button>
-          <button
-            type="button"
-            onClick={onExport}
-            className="rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
-          >
+          <button type="button" onClick={onExport} className="ww-button px-2 py-2 text-xs text-[color:var(--ww-muted)]">
             Export
           </button>
         </div>
         <input ref={inputRef} type="file" accept="application/json" className="hidden" onChange={handleImportChange} />
       </div>
 
-      <div className="mt-auto space-y-3 border-t border-slate-200 pt-5">
+      <div className="mt-auto space-y-3 border-t border-[color:var(--ww-border)] pt-5">
         <NavUtilityButton label="Settings" onClick={onToggleTheme} detail={theme === 'dark' ? 'Light' : 'Dark'} />
         {onShowCloudSetup && <NavUtilityButton label="Cloud setup" onClick={onShowCloudSetup} detail={modeLabel} />}
         {userEmail && (
-          <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+          <div className="rounded-lg border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-3 text-xs text-[color:var(--ww-muted)]">
             <div
               className={`mb-1 inline-flex rounded-full px-2 py-0.5 font-medium ${
-                syncStatus === 'error' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
+                syncStatus === 'error'
+                  ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-200'
+                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-200'
               }`}
             >
               {SYNC_STATUS_LABELS[syncStatus] || SYNC_STATUS_LABELS.saved}
@@ -127,7 +127,7 @@ export default function AppHeader({
           <button
             type="button"
             onClick={onSignOut}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+            className="ww-button w-full px-3 py-2 text-sm font-medium text-[color:var(--ww-muted)]"
           >
             Sign Out
           </button>
@@ -140,10 +140,64 @@ export default function AppHeader({
 function BrandMark() {
   return (
     <div className="relative h-8 w-9">
-      <span className="absolute left-0 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-blue-600" />
-      <span className="absolute left-3 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-sky-500" />
-      <span className="absolute left-6 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-fuchsia-600" />
+      <span className="absolute left-0 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-blue-500" />
+      <span className="absolute left-3 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-cyan-400" />
+      <span className="absolute left-6 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-violet-500" />
     </div>
+  )
+}
+
+function NavIcon({ name }) {
+  const common = {
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    strokeWidth: 1.8,
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+      {name === 'calendar' && (
+        <>
+          <rect x="4" y="5" width="16" height="15" rx="3" {...common} />
+          <path d="M8 3v4M16 3v4M4 10h16" {...common} />
+        </>
+      )}
+      {name === 'timeline' && (
+        <>
+          <path d="M5 7h8M5 17h14M11 12h8" {...common} />
+          <circle cx="17" cy="7" r="2" {...common} />
+          <circle cx="7" cy="12" r="2" {...common} />
+        </>
+      )}
+      {name === 'cards' && (
+        <>
+          <rect x="4" y="4" width="7" height="7" rx="2" {...common} />
+          <rect x="13" y="4" width="7" height="7" rx="2" {...common} />
+          <rect x="4" y="13" width="7" height="7" rx="2" {...common} />
+          <rect x="13" y="13" width="7" height="7" rx="2" {...common} />
+        </>
+      )}
+      {name === 'workloads' && (
+        <>
+          <path d="M5 19V9M12 19V5M19 19v-7" {...common} />
+          <path d="M4 19h16" {...common} />
+        </>
+      )}
+      {name === 'projects' && (
+        <>
+          <path d="M4 7h6l2 2h8v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" {...common} />
+          <path d="M4 9V6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v1" {...common} />
+        </>
+      )}
+      {name === 'insights' && (
+        <>
+          <path d="M5 16c3-7 6-7 9-3 2 3 3 3 5-2" {...common} />
+          <path d="M5 20h14" {...common} />
+        </>
+      )}
+    </svg>
   )
 }
 
@@ -152,7 +206,7 @@ function NavUtilityButton({ label, detail, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+      className="flex w-full items-center justify-between rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-[color:var(--ww-muted)] hover:border-[color:var(--ww-border-soft)] hover:bg-[color:var(--ww-panel-bg)] hover:text-[color:var(--ww-heading)]"
     >
       <span>{label}</span>
       {detail && <span className="text-xs text-slate-400">{detail}</span>}
