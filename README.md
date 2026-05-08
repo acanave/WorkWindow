@@ -2,7 +2,9 @@
 
 WorkWindow is the planner I wanted after bouncing between too many half-helpful tools. I kept running into the same problem: my to-do list knew what existed, my calendar knew when things were happening, and my Kanban board knew what was moving, but none of them talked to each other in a way that actually helped me get through real work.
 
-So I built one workspace that combines all three. WorkWindow brings together a to-do list mindset, a calendar view, and a Kanban progress tracker so planning feels less like maintaining three separate systems and more like seeing the whole week clearly. It is designed to feel fast, focused, and a little opinionated in the best way: lightweight enough for everyday personal productivity, but structured enough to show dependencies, delivery risk, and momentum at a glance.
+So I built one workspace that combines all three. WorkWindow brings together a to-do list mindset, a calendar view, and a Kanban progress tracker around one core idea: every task or event has a work window, the real block of time needed to make that obligation possible before its deadline. Travel, preparation, focused execution, setup, and buffer all belong in that footprint.
+
+The calendar is meant to show both sides of the commitment: the anchor task or event, and the supporting work windows visually tied to it. That makes the schedule less about what is merely due, and more about what it actually takes to get there.
 
 Under the hood, it is also a local-first frontend engineering project with an optional upgrade path to authenticated cloud sync and multi-device access.
 
@@ -66,7 +68,7 @@ Notes:
 ## Product Highlights
 
 - Kanban board with Backlog, In Progress, Blocked, and Done lanes
-- Month calendar with draggable planning blocks
+- Month calendar with due-date anchors and draggable work windows
 - dependency warnings, chain visibility, and cycle badges
 - due-date risk signals and shortfall indicators
 - performance panel with burnup, plan coverage, and weekly velocity
@@ -112,9 +114,9 @@ State is stored locally with key `workwindow:data:v2`. When cloud sync is config
       description,
       status,
       estimate_points,
-      due_date,
+      due_date, // anchor date
       dependencies: [cardId],
-      planned_day_blocks: [{ id, date: "YYYY-MM-DD", points: 1 }],
+      planned_day_blocks: [{ id, date: "YYYY-MM-DD", points: 1 }], // work windows
       completed_points,
       progress_log: [{ id, date: "YYYY-MM-DD", delta: 1 }]
     }

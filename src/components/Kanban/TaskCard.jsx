@@ -28,11 +28,14 @@ export default function TaskCard({
       draggable
       onDragStart={handleDragStart}
       onClick={onOpen}
-      className="cursor-pointer rounded-md border border-slate-300 bg-white p-3 shadow-sm hover:border-slate-400"
+      className={`cursor-pointer rounded-lg border bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${getCardTone(card.status)}`}
     >
       <div className="mb-2 flex items-start justify-between gap-2">
-        <h4 className="text-sm font-semibold text-slate-900">{card.title}</h4>
+        <h4 className="text-sm font-bold text-slate-950">{card.title}</h4>
         <div className="flex flex-col items-end gap-1">
+          {card.due_date && card.planned_day_blocks.length > 0 && (
+            <span className="rounded bg-blue-600 px-2 py-0.5 text-[11px] font-bold uppercase text-white">Anchor</span>
+          )}
           {risk && (
             <span
               className={`rounded px-2 py-0.5 text-xs font-medium ${
@@ -59,12 +62,17 @@ export default function TaskCard({
         </div>
       </div>
 
-      <div className="space-y-1 text-xs text-slate-600">
+      <div className="space-y-2 text-xs text-slate-600">
+        <div className="flex items-center justify-between gap-2">
+          <span>{card.due_date ? `Due ${card.due_date}` : 'No anchor date'}</span>
+          <span className="font-bold text-slate-800">{totalPlanned}pt</span>
+        </div>
+        <div className="h-1.5 rounded-full bg-slate-100">
+          <div className="h-1.5 rounded-full bg-blue-600" style={{ width: `${completion}%` }} />
+        </div>
         <p>
-          {card.completed_points}/{card.estimate_points} pts complete ({completion}%)
+          {card.completed_points}/{card.estimate_points} pts complete
         </p>
-        <p>{totalPlanned} pts planned</p>
-        {card.due_date && <p>Due {card.due_date}</p>}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2" onClick={(event) => event.stopPropagation()}>
@@ -82,9 +90,9 @@ export default function TaskCard({
         </button>
         <button
           onClick={() => onPlanSelectedDate(card.id)}
-          className="rounded border border-cyan-300 bg-cyan-50 px-2 py-1 text-xs font-medium text-cyan-900 hover:bg-cyan-100"
+          className="rounded border border-blue-200 bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
         >
-          Plan to {selectedDate}
+          Add window {selectedDate}
         </button>
         <label className="sr-only" htmlFor={`status-${card.id}`}>
           Move {card.title}
@@ -105,4 +113,11 @@ export default function TaskCard({
       </div>
     </article>
   )
+}
+
+function getCardTone(status) {
+  if (status === 'In Progress') return 'border-blue-300'
+  if (status === 'Blocked') return 'border-fuchsia-200 bg-fuchsia-50/50'
+  if (status === 'Done') return 'border-emerald-200 bg-emerald-50/50'
+  return 'border-slate-200'
 }

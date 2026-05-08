@@ -6,7 +6,18 @@ const SYNC_STATUS_LABELS = {
   error: 'Sync error',
 }
 
+const NAV_ITEMS = [
+  { id: 'calendar', label: 'Calendar', icon: 'Cal' },
+  { id: 'timeline', label: 'Timeline', icon: 'Line', disabled: true },
+  { id: 'cards', label: 'Cards', icon: 'Grid' },
+  { id: 'workloads', label: 'Workloads', icon: 'Load', disabled: true },
+  { id: 'projects', label: 'Projects', icon: 'Proj', disabled: true },
+  { id: 'insights', label: 'Insights', icon: 'Bars', disabled: true },
+]
+
 export default function AppHeader({
+  activeView = 'calendar',
+  onChangeView,
   onNewCard,
   onExport,
   onImport,
@@ -34,78 +45,117 @@ export default function AppHeader({
   }
 
   return (
-    <header className="border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
-      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">WorkWindow</h1>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          {modeLabel && (
-            <span className="mr-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              {modeLabel}
-            </span>
-          )}
-          {userEmail && (
-            <div className="mr-2 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+    <aside className="flex w-[224px] shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-5">
+      <div className="mb-8 flex items-center gap-3 px-1">
+        <BrandMark />
+        <span className="text-xl font-bold tracking-normal text-slate-950">WorkWindow</span>
+      </div>
+
+      <nav className="space-y-1">
+        {NAV_ITEMS.map((item) => {
+          const active = activeView === item.id
+          return (
+            <button
+              key={item.id}
+              type="button"
+              disabled={item.disabled}
+              onClick={() => onChangeView?.(item.id)}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition ${
+                active
+                  ? 'bg-blue-50 text-blue-700'
+                  : item.disabled
+                    ? 'cursor-not-allowed text-slate-400'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
+              }`}
+            >
               <span
-                className={`rounded-full px-2 py-1 font-medium ${
-                  syncStatus === 'error'
-                    ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-200'
-                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200'
+                className={`flex h-6 w-6 items-center justify-center rounded-md border text-[10px] ${
+                  active ? 'border-blue-200 bg-white text-blue-700' : 'border-slate-200 bg-white text-slate-500'
                 }`}
               >
-                {SYNC_STATUS_LABELS[syncStatus] || SYNC_STATUS_LABELS.saved}
+                {item.icon}
               </span>
-              <span className="max-w-[220px] truncate">{userEmail}</span>
-            </div>
-          )}
+              {item.label}
+            </button>
+          )
+        })}
+      </nav>
+
+      <div className="mt-7 border-t border-slate-200 pt-5">
+        <button
+          type="button"
+          onClick={onNewCard}
+          className="w-full rounded-lg bg-blue-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+        >
+          New Work Item
+        </button>
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <button
-            onClick={onToggleTheme}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            {theme === 'dark' ? 'Light' : 'Dark'} mode
-          </button>
-          <button
-            onClick={onNewCard}
-            className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
-          >
-            New Card
-          </button>
-          <button
-            onClick={onExport}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            Export JSON
-          </button>
-          <button
+            type="button"
             onClick={handlePickFile}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+            className="rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
           >
-            Import JSON
+            Import
           </button>
-          {onShowCloudSetup && (
-            <button
-              onClick={onShowCloudSetup}
-              className="rounded-md border border-cyan-300 px-3 py-2 text-sm font-medium text-cyan-900 hover:bg-cyan-50 dark:border-cyan-700 dark:text-cyan-100 dark:hover:bg-cyan-950/40"
-            >
-              Cloud Setup
-            </button>
-          )}
-          {onSignOut && (
-            <button
-              onClick={onSignOut}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
-            >
-              Sign Out
-            </button>
-          )}
-          <input
-            ref={inputRef}
-            type="file"
-            accept="application/json"
-            className="hidden"
-            onChange={handleImportChange}
-          />
+          <button
+            type="button"
+            onClick={onExport}
+            className="rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+          >
+            Export
+          </button>
         </div>
+        <input ref={inputRef} type="file" accept="application/json" className="hidden" onChange={handleImportChange} />
       </div>
-    </header>
+
+      <div className="mt-auto space-y-3 border-t border-slate-200 pt-5">
+        <NavUtilityButton label="Settings" onClick={onToggleTheme} detail={theme === 'dark' ? 'Light' : 'Dark'} />
+        {onShowCloudSetup && <NavUtilityButton label="Cloud setup" onClick={onShowCloudSetup} detail={modeLabel} />}
+        {userEmail && (
+          <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+            <div
+              className={`mb-1 inline-flex rounded-full px-2 py-0.5 font-medium ${
+                syncStatus === 'error' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
+              }`}
+            >
+              {SYNC_STATUS_LABELS[syncStatus] || SYNC_STATUS_LABELS.saved}
+            </div>
+            <div className="truncate">{userEmail}</div>
+          </div>
+        )}
+        {onSignOut && (
+          <button
+            type="button"
+            onClick={onSignOut}
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          >
+            Sign Out
+          </button>
+        )}
+      </div>
+    </aside>
+  )
+}
+
+function BrandMark() {
+  return (
+    <div className="relative h-8 w-9">
+      <span className="absolute left-0 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-blue-600" />
+      <span className="absolute left-3 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-sky-500" />
+      <span className="absolute left-6 top-1 h-7 w-2.5 rotate-[-25deg] rounded-full bg-fuchsia-600" />
+    </div>
+  )
+}
+
+function NavUtilityButton({ label, detail, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+    >
+      <span>{label}</span>
+      {detail && <span className="text-xs text-slate-400">{detail}</span>}
+    </button>
   )
 }

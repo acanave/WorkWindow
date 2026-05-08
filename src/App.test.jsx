@@ -51,7 +51,7 @@ describe('App public launch modes', () => {
 
     expect(screen.getByText('Local-first mode')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /cloud setup/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /new card/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /new work item/i })).toBeInTheDocument()
   })
 
   it('shows the cloud setup guide from the chooser', async () => {

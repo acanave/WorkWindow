@@ -3,8 +3,6 @@ import AppHeader from './components/AppHeader'
 import AuthScreen from './components/Auth/AuthScreen'
 import MonthCalendar from './components/Calendar/MonthCalendar'
 import KanbanBoard from './components/Kanban/KanbanBoard'
-import DependencyPanel from './components/Kanban/DependencyPanel'
-import PerformancePanel from './components/Insights/PerformancePanel'
 import CardModal from './components/CardModal/CardModal'
 import CloudSetupScreen from './components/Mode/CloudSetupScreen'
 import ModeChooserScreen from './components/Mode/ModeChooserScreen'
@@ -62,6 +60,7 @@ function clearStoredLaunchMode() {
 function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, user = null, onSignOut = null }) {
   const { state, dispatch } = useStore()
   const [modal, setModal] = useState({ open: false, mode: 'create', cardId: null })
+  const [activeView, setActiveView] = useState('calendar')
   const [syncStatus, setSyncStatus] = useState('saved')
   const [theme, setTheme] = useState(() => {
     const saved = window.localStorage.getItem('workwindow:theme')
@@ -150,51 +149,71 @@ function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, 
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <AppHeader
-        onNewCard={openCreate}
-        onExport={handleExport}
-        onImport={handleImport}
-        onSignOut={cloudSyncEnabled ? onSignOut : null}
-        onShowCloudSetup={onShowCloudSetup}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        userEmail={cloudSyncEnabled ? user?.email : null}
-        modeLabel={modeLabel}
-        syncStatus={syncStatus}
-      />
+    <div className="min-h-screen bg-slate-100 p-3 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1760px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+        <AppHeader
+          activeView={activeView}
+          onChangeView={setActiveView}
+          onNewCard={openCreate}
+          onExport={handleExport}
+          onImport={handleImport}
+          onSignOut={cloudSyncEnabled ? onSignOut : null}
+          onShowCloudSetup={onShowCloudSetup}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          userEmail={cloudSyncEnabled ? user?.email : null}
+          modeLabel={modeLabel}
+          syncStatus={syncStatus}
+        />
 
-      <main className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-4 xl:grid-cols-[1.1fr_1fr]">
-        <section className="space-y-4">
-          <PerformancePanel snapshot={performanceSnapshot} />
-          <KanbanBoard
-            cards={state.cards}
-            selectedDate={state.ui.selectedDate}
-            unresolvedMap={unresolvedMap}
-            chainDepthByCardId={dependencyInsights.chainDepthByCardId}
-            hasCycleByCardId={dependencyInsights.hasCycleByCardId}
-            riskByCardId={riskByCardId}
-            onCreateCard={createCard}
-            onOpenCard={openEdit}
-            onMoveCard={moveCard}
-            onLogProgress={logProgress}
-            onPlanCardToSelectedDate={addDayBlockOnSelectedDate}
-          />
-          <DependencyPanel cards={state.cards} dependencyInsights={dependencyInsights} onOpenCard={openEdit} />
-        </section>
+        <main className="min-w-0 flex-1 px-4 py-5 md:px-7">
+          <section className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold tracking-normal text-slate-950 md:text-[28px]">
+                {activeView === 'calendar' ? (
+                  <>
+                    See not just what is scheduled. See <span className="text-blue-600">what it takes</span> to make it
+                    happen.
+                  </>
+                ) : (
+                  <>
+                    Plan with clarity. Execute with confidence.{' '}
+                    <span className="text-blue-600">Cards that drive results.</span>
+                  </>
+                )}
+              </h1>
+            </div>
+          </section>
 
-        <section>
-          <MonthCalendar
-            cards={state.cards}
-            riskByCardId={riskByCardId}
-            selectedDate={state.ui.selectedDate}
-            onSelectDate={setSelectedDate}
-            onDropCard={addDayBlock}
-            onUpdateBlock={updateDayBlock}
-            onDeleteBlock={deleteDayBlock}
-          />
-        </section>
-      </main>
+          {activeView === 'calendar' ? (
+            <MonthCalendar
+              cards={state.cards}
+              riskByCardId={riskByCardId}
+              selectedDate={state.ui.selectedDate}
+              onSelectDate={setSelectedDate}
+              onDropCard={addDayBlock}
+              onUpdateBlock={updateDayBlock}
+              onDeleteBlock={deleteDayBlock}
+            />
+          ) : (
+            <KanbanBoard
+              cards={state.cards}
+              selectedDate={state.ui.selectedDate}
+              unresolvedMap={unresolvedMap}
+              chainDepthByCardId={dependencyInsights.chainDepthByCardId}
+              hasCycleByCardId={dependencyInsights.hasCycleByCardId}
+              riskByCardId={riskByCardId}
+              onCreateCard={createCard}
+              onOpenCard={openEdit}
+              onMoveCard={moveCard}
+              onLogProgress={logProgress}
+              onPlanCardToSelectedDate={addDayBlockOnSelectedDate}
+              performanceSnapshot={performanceSnapshot}
+              dependencyInsights={dependencyInsights}
+            />
+          )}
+        </main>
+      </div>
 
       {modal.open && (
         <CardModal
