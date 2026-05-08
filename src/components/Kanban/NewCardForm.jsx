@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function NewCardForm({ onSubmit }) {
+export default function NewCardForm({ onSubmit, compact = false }) {
   const [title, setTitle] = useState('')
 
   const handleSubmit = (event) => {
@@ -11,18 +11,21 @@ export default function NewCardForm({ onSubmit }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-3 rounded-md border border-slate-300 bg-white p-2">
+    <form
+      onSubmit={handleSubmit}
+      className={compact ? 'space-y-2' : 'mb-3 rounded-md border border-slate-300 bg-white p-2'}
+    >
       <input
         value={title}
         onChange={(event) => setTitle(event.target.value)}
-        placeholder="Quick add card..."
-        className="w-full rounded border border-slate-300 px-2 py-1 text-sm outline-none focus:border-slate-500"
+        placeholder="Quick add work item..."
+        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
       />
       <button
         type="submit"
-        className="mt-2 w-full rounded bg-slate-900 px-2 py-1.5 text-sm font-medium text-white hover:bg-slate-700"
+        className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700"
       >
-        Add to Backlog
+        Add work item
       </button>
     </form>
   )

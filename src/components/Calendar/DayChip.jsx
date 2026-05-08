@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export default function DayChip({ block, cardTitle, onUpdate, onDelete }) {
+export default function DayChip({ block, cardTitle, accent, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false)
   const [points, setPoints] = useState(block.points)
 
@@ -15,7 +15,12 @@ export default function DayChip({ block, cardTitle, onUpdate, onDelete }) {
 
   if (editing) {
     return (
-      <div className="rounded border border-slate-300 bg-white p-1 text-xs shadow">
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className={`rounded border border-l-4 border-slate-300 bg-white p-1 text-xs shadow ${
+          accent?.agenda || 'border-l-slate-500'
+        }`}
+      >
         <div className="flex items-center gap-1">
           <input
             type="number"
@@ -41,10 +46,16 @@ export default function DayChip({ block, cardTitle, onUpdate, onDelete }) {
 
   return (
     <button
-      onClick={() => setEditing(true)}
-      className="w-full truncate rounded bg-slate-900 px-1.5 py-1 text-left text-[11px] text-white hover:bg-slate-700"
-      title={`${cardTitle} • ${block.points}pt`}
+      onClick={(event) => {
+        event.stopPropagation()
+        setEditing(true)
+      }}
+      className={`w-full truncate rounded-lg border border-l-4 px-2 py-2 text-left text-[11px] font-medium ${
+        accent?.workWindow || 'border-l-slate-900 bg-slate-900 text-white hover:bg-slate-700'
+      }`}
+      title={`Work window: ${cardTitle} • ${block.points}pt`}
     >
+      <span className="mr-1 text-[10px] uppercase opacity-75">Window</span>
       {cardTitle} • {block.points}pt
     </button>
   )

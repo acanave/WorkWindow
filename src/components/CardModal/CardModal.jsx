@@ -65,7 +65,9 @@ export default function CardModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4" onClick={onClose}>
       <div className="w-full max-w-xl rounded-lg bg-white p-4 shadow-xl" onClick={(event) => event.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">{mode === 'create' ? 'Create Card' : 'Edit Card'}</h2>
+          <h2 className="text-lg font-semibold text-slate-900">
+            {mode === 'create' ? 'Create Work Item' : 'Edit Work Item'}
+          </h2>
           <button onClick={onClose} className="rounded border border-slate-300 px-2 py-1 text-sm">
             Close
           </button>
@@ -109,7 +111,7 @@ export default function CardModal({
             </label>
 
             <label>
-              <span className="mb-1 block text-sm font-medium text-slate-700">Estimate points</span>
+              <span className="mb-1 block text-sm font-medium text-slate-700">Required window points</span>
               <input
                 type="number"
                 min={1}
@@ -120,7 +122,7 @@ export default function CardModal({
             </label>
 
             <label>
-              <span className="mb-1 block text-sm font-medium text-slate-700">Due date</span>
+              <span className="mb-1 block text-sm font-medium text-slate-700">Anchor due date</span>
               <input
                 type="date"
                 value={dueDate}
@@ -169,7 +171,7 @@ export default function CardModal({
           {card && (
             <div className="rounded border border-slate-200 bg-slate-50 p-2">
               <p className="text-sm text-slate-700">
-                Progress: {card.completed_points}/{card.estimate_points} ({completion}%)
+                Work completed: {card.completed_points}/{card.estimate_points} ({completion}%)
               </p>
               <div className="mt-2 flex gap-2">
                 <button
