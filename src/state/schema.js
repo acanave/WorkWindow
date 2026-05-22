@@ -83,7 +83,7 @@ export function migrateToLatest(raw) {
   const version = Number.isInteger(raw?.version) ? raw.version : 1
 
   if (version > SCHEMA_VERSION) {
-    throw new Error('Unsupported schema version')
+    return raw
   }
 
   if (version <= 1) {

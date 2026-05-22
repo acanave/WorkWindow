@@ -13,7 +13,8 @@ export default function CloudSetupScreen({ onBack, onChooseLocal }) {
           <li>1. Copy `.env.example` to `.env.local`.</li>
           <li>2. Fill in `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.</li>
           <li>3. Run `docs/supabase.sql` in your Supabase SQL editor.</li>
-          <li>4. Restart the dev server or redeploy your hosted app.</li>
+          <li>4. Check Auth Hooks and email settings in the Supabase dashboard if magic links are blocked.</li>
+          <li>5. Restart the dev server or redeploy your hosted app.</li>
         </ol>
 
         <div className="mt-6 rounded-2xl border border-[#2b384d] bg-[#111a2a] p-4 text-sm text-[#c8d3e3]">

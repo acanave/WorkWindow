@@ -36,6 +36,17 @@ describe('schema migration and import validation', () => {
     expect(parsed.cards[0].progress_log).toEqual([])
   })
 
+  it('loads future runtime state by normalizing known fields', () => {
+    const parsed = normalizeState({
+      version: 99,
+      ui: { selectedDate: '2026-03-01' },
+      cards: [{ id: 'c1', title: 'Future Task', planned_day_blocks: [] }],
+    })
+
+    expect(parsed.version).toBe(SCHEMA_VERSION)
+    expect(parsed.cards[0].title).toBe('Future Task')
+  })
+
   it('rejects duplicate card IDs during import', () => {
     expect(() =>
       parseImportPayload(
