@@ -1,16 +1,76 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getSupabaseConfigError, getSupabaseClient, isSupabaseConfigured } from '../../lib/supabase'
+import { formatMagicLinkError } from './authErrors'
+
+const MAGIC_LINK_COOLDOWN_MS = 60_000
+const MAGIC_LINK_COOLDOWN_KEY = 'workwindow:magic-link-cooldown-until'
+
+function getStoredCooldownUntil() {
+  try {
+    const value = Number.parseInt(window.localStorage.getItem(MAGIC_LINK_COOLDOWN_KEY) || '', 10)
+    return Number.isFinite(value) ? value : 0
+  } catch {
+    return 0
+  }
+}
+
+function setStoredCooldownUntil(until) {
+  try {
+    if (until > Date.now()) {
+      window.localStorage.setItem(MAGIC_LINK_COOLDOWN_KEY, String(until))
+    } else {
+      window.localStorage.removeItem(MAGIC_LINK_COOLDOWN_KEY)
+    }
+  } catch {
+    // ignore localStorage write failures
+  }
+}
 
 export default function AuthScreen({ errorMessage }) {
   const [email, setEmail] = useState('')
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
+  const [cooldownUntil, setCooldownUntil] = useState(() => getStoredCooldownUntil())
+  const [now, setNow] = useState(() => Date.now())
 
   const configError = getSupabaseConfigError()
+  const cooldownRemainingSeconds = useMemo(() => {
+    const remaining = Math.ceil((cooldownUntil - now) / 1000)
+    return Math.max(0, remaining)
+  }, [cooldownUntil, now])
+
+  useEffect(() => {
+    if (!cooldownUntil) return
+
+    const intervalId = window.setInterval(() => {
+      setNow(Date.now())
+    }, 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [cooldownUntil])
+
+  useEffect(() => {
+    if (cooldownUntil && cooldownUntil <= Date.now()) {
+      setCooldownUntil(0)
+      setStoredCooldownUntil(0)
+    }
+  }, [cooldownUntil, now])
+
+  const beginCooldown = () => {
+    const until = Date.now() + MAGIC_LINK_COOLDOWN_MS
+    setCooldownUntil(until)
+    setStoredCooldownUntil(until)
+    setNow(Date.now())
+    return until
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     if (!isSupabaseConfigured()) return
+    if (cooldownRemainingSeconds > 0) {
+      setNotice(`Please wait ${cooldownRemainingSeconds}s before requesting another magic link.`)
+      return
+    }
 
     const normalizedEmail = email.trim().toLowerCase()
     if (!normalizedEmail) return
@@ -29,9 +89,24 @@ export default function AuthScreen({ errorMessage }) {
 
       if (error) throw error
 
-      setNotice('Magic link sent. Open it on this device to finish signing in.')
+      beginCooldown()
+      setNotice(
+        'Magic link sent. Open it on this device to finish signing in. You can request another link in 60 seconds.',
+      )
     } catch (error) {
-      setNotice(error.message || 'Unable to send sign-in email.')
+      const nextMessage = formatMagicLinkError(error)
+      setNotice(nextMessage)
+
+      const code = String(error?.code || '').toLowerCase()
+      const message = String(error?.message || '').toLowerCase()
+      if (
+        code === 'over_email_send_rate_limit' ||
+        code === 'over_request_rate_limit' ||
+        code === 'rate_limit_exceeded' ||
+        message.includes('rate exceeded')
+      ) {
+        beginCooldown()
+      }
     } finally {
       setPending(false)
     }
@@ -71,10 +146,14 @@ export default function AuthScreen({ errorMessage }) {
             </label>
             <button
               type="submit"
-              disabled={pending}
+              disabled={pending || cooldownRemainingSeconds > 0}
               className="w-full rounded-xl bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:bg-cyan-300/70"
             >
-              {pending ? 'Sending link...' : 'Email Me a Magic Link'}
+              {pending
+                ? 'Sending link...'
+                : cooldownRemainingSeconds > 0
+                  ? `Wait ${cooldownRemainingSeconds}s`
+                  : 'Email Me a Magic Link'}
             </button>
           </form>
         )}
@@ -83,6 +162,15 @@ export default function AuthScreen({ errorMessage }) {
           <div className="mt-4 rounded-xl border border-[#2b384d] bg-[#111a2a] p-4 text-sm text-[#c8d3e3]">
             {errorMessage || notice}
           </div>
+        )}
+
+        {!configError && (
+          <p className="mt-4 text-xs leading-5 text-[#8795aa]">
+            If a magic link sends you back here, check that the exact deployed URL is allowed in Supabase Redirect URLs
+            and open the link in the same browser or device that requested it. If Supabase shows an auth hook error,
+            inspect the Before User Created hook or email allowlist in the dashboard. The button is rate-limited to one
+            request per 60 seconds to match Supabase.
+          </p>
         )}
       </section>
     </main>

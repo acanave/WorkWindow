@@ -3,9 +3,9 @@ import { normalizeState } from './schema'
 
 const USER_STATES_TABLE = 'user_states'
 
-export async function fetchRemoteState() {
+export async function fetchRemoteState(userId) {
   const supabase = getSupabaseClient()
-  const { data, error } = await supabase.from(USER_STATES_TABLE).select('state').maybeSingle()
+  const { data, error } = await supabase.from(USER_STATES_TABLE).select('state').eq('user_id', userId).maybeSingle()
 
   if (error) {
     throw error

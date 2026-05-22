@@ -47,8 +47,12 @@ Use this path if you want authenticated sync across devices or a hosted deployme
 5. Fill in:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_PUBLISHABLE_KEY`
-6. Restart `npm run dev` or deploy the app with the same env vars.
-7. If you deploy to Vercel, add your app URL to Supabase redirect settings.
+6. Check Supabase Auth settings:
+   - Redirect URLs should include your local and deployed app origins
+   - Auth Hooks should not block new signups unless that is intentional
+   - If you are using the built-in SMTP provider, make sure the recipient is an allowed team email
+7. Restart `npm run dev` or deploy the app with the same env vars.
+8. If you deploy to Vercel, add your app URL to Supabase redirect settings.
 
 Notes:
 
