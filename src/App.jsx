@@ -24,8 +24,13 @@ const LAUNCH_MODES = {
 
 function getAccessErrorMessage(error, fallbackMessage) {
   const message = error?.message || ''
+  const lowerMessage = message.toLowerCase()
 
-  if (message.toLowerCase().includes('row-level security')) {
+  if (lowerMessage.includes('user_states') && lowerMessage.includes('does not exist')) {
+    return 'Cloud sync is missing the user_states table. Run docs/supabase.sql in your Supabase SQL editor.'
+  }
+
+  if (lowerMessage.includes('row-level security') || lowerMessage.includes('permission denied')) {
     return 'This account does not have access to the synced workspace.'
   }
 
@@ -57,7 +62,14 @@ function clearStoredLaunchMode() {
   }
 }
 
-function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, user = null, onSignOut = null }) {
+function WorkWindowApp({
+  cloudSyncEnabled = false,
+  modeLabel,
+  onShowCloudSetup,
+  user = null,
+  onSignOut = null,
+  syncErrorMessage = '',
+}) {
   const { state, dispatch } = useStore()
   const [modal, setModal] = useState({ open: false, mode: 'create', cardId: null })
   const [activeView, setActiveView] = useState('calendar')
@@ -169,16 +181,26 @@ function WorkWindowApp({ cloudSyncEnabled = false, modeLabel, onShowCloudSetup, 
           onNewCard={openCreate}
           onExport={handleExport}
           onImport={handleImport}
-          onSignOut={cloudSyncEnabled ? onSignOut : null}
+          onSignOut={onSignOut}
           onShowCloudSetup={onShowCloudSetup}
           theme={theme}
           onToggleTheme={toggleTheme}
-          userEmail={cloudSyncEnabled ? user?.email : null}
+          userEmail={user?.email || null}
           modeLabel={modeLabel}
-          syncStatus={syncStatus}
+          syncStatus={syncErrorMessage ? 'error' : syncStatus}
         />
 
         <main className="min-w-0 flex-1 px-4 py-5 md:px-7">
+          {syncErrorMessage && (
+            <section className="mb-5 rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-950 shadow-sm dark:border-amber-400/25 dark:bg-amber-950/30 dark:text-amber-100">
+              <div className="font-semibold">Cloud sync unavailable. Running in local mode.</div>
+              <p className="mt-1 leading-6">
+                Your magic-link login worked, but WorkWindow could not load the synced workspace from Supabase. Local
+                changes remain in this browser until cloud sync is fixed. Detail: {syncErrorMessage}
+              </p>
+            </section>
+          )}
+
           <section className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <h1 className="ww-page-title max-w-5xl text-2xl font-semibold leading-tight tracking-normal md:text-[29px]">
@@ -350,7 +372,7 @@ function useBootstrapState(user) {
 
       try {
         const localState = loadState()
-        const remoteState = await fetchRemoteState()
+        const remoteState = await fetchRemoteState(user.id)
         if (cancelled) return
 
         if (remoteState) {
@@ -375,10 +397,12 @@ function useBootstrapState(user) {
         })
       } catch (error) {
         if (cancelled) return
+        const fallbackState = loadState() || createInitialState()
+        saveState(fallbackState)
         setBootstrap({
           errorMessage: getAccessErrorMessage(error, 'Unable to load your synced workspace.'),
-          state: createInitialState(),
-          status: 'error',
+          state: fallbackState,
+          status: 'ready',
         })
       }
     }
@@ -422,13 +446,15 @@ function SecureApp() {
     return <LoadingScreen message="Loading your synced workspace..." />
   }
 
-  if (bootstrap.status === 'error') {
-    return <AuthScreen errorMessage={bootstrap.errorMessage} />
-  }
-
   return (
     <StoreProvider key={user.id} initialState={bootstrap.state}>
-      <WorkWindowApp cloudSyncEnabled modeLabel="Cloud sync" user={user} onSignOut={handleSignOut} />
+      <WorkWindowApp
+        cloudSyncEnabled={!bootstrap.errorMessage}
+        modeLabel={bootstrap.errorMessage ? 'Local mode' : 'Cloud sync'}
+        user={user}
+        onSignOut={handleSignOut}
+        syncErrorMessage={bootstrap.errorMessage}
+      />
     </StoreProvider>
   )
 }
