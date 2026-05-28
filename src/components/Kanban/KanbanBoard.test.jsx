@@ -73,7 +73,9 @@ describe('KanbanBoard', () => {
     expect(titles).toEqual(['Due sooner', 'Due later', 'No due'])
   })
 
-  it('shows risk badge for cards with due-date shortfall', () => {
+  it('shows risk badge for cards with due-date shortfall', async () => {
+    const user = userEvent.setup()
+
     renderBoard([makeCard({ id: 'c1', title: 'At risk task' })], {
       c1: {
         kind: 'at_risk',
@@ -84,10 +86,13 @@ describe('KanbanBoard', () => {
       },
     })
 
+    await user.click(screen.getByRole('button', { name: /expand at risk task/i }))
     expect(screen.getByText('Short 2pt')).toBeInTheDocument()
   })
 
-  it('shows chain depth and cycle badges', () => {
+  it('shows chain depth and cycle badges', async () => {
+    const user = userEvent.setup()
+
     renderBoard(
       [makeCard({ id: 'c1', title: 'Chained task' }), makeCard({ id: 'c2', title: 'Cycle task' })],
       {},
@@ -95,8 +100,43 @@ describe('KanbanBoard', () => {
       { c2: true },
     )
 
+    await user.click(screen.getByRole('button', { name: /expand chained task/i }))
     expect(screen.getByText('Chain 3 deep')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /expand cycle task/i }))
     expect(screen.getByText('Cycle')).toBeInTheDocument()
+  })
+
+  it('expands a compact card in place and opens edit from the expanded view', async () => {
+    const user = userEvent.setup()
+    const onOpenCard = vi.fn()
+
+    render(
+      <KanbanBoard
+        cards={[makeCard({ id: 'c1', title: 'Expandable task', description: 'Hidden until expanded' })]}
+        selectedDate="2026-03-10"
+        unresolvedMap={{}}
+        chainDepthByCardId={{}}
+        hasCycleByCardId={{}}
+        riskByCardId={{}}
+        onCreateCard={noop}
+        onOpenCard={onOpenCard}
+        onMoveCard={noop}
+        onLogProgress={noop}
+        onPlanCardToSelectedDate={noop}
+      />,
+    )
+
+    expect(screen.queryByText('Hidden until expanded')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /expand expandable task/i }))
+
+    expect(screen.getByText('Hidden until expanded')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Edit' }))
+
+    expect(onOpenCard).toHaveBeenCalledWith('c1')
   })
 
   it('plans a card to the selected day with the touch fallback action', async () => {
@@ -119,6 +159,7 @@ describe('KanbanBoard', () => {
       />,
     )
 
+    await user.click(screen.getByRole('button', { name: /add window 2026-03-10/i }))
     await user.click(screen.getByRole('button', { name: /add window 2026-03-10/i }))
 
     expect(onPlanCardToSelectedDate).toHaveBeenCalledWith('c1')
@@ -144,6 +185,7 @@ describe('KanbanBoard', () => {
       />,
     )
 
+    await user.click(screen.getByRole('button', { name: /expand touch task/i }))
     await user.selectOptions(screen.getByLabelText(/move touch task/i), 'Blocked')
 
     expect(onMoveCard).toHaveBeenCalledWith('c1', 'Blocked')

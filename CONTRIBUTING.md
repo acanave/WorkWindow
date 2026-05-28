@@ -56,6 +56,24 @@ Build artifact policy:
 
 - CI uploads `dist` as an artifact only for pushes to `main`.
 
+## Secret scanning
+
+GitHub Actions workflow: `.github/workflows/secret-scan.yml`
+
+Triggers:
+
+- Every push to any branch
+- Every pull request targeting `main`
+
+Behavior:
+
+- Runs Gitleaks against the repository history and current tree.
+- Fails the workflow if a potential secret is detected.
+
+Recommended branch protection addition:
+
+1. Require status check: `Secret Scan / Gitleaks`.
+
 ## Release workflow
 
 GitHub Actions workflow: `.github/workflows/release.yml`
