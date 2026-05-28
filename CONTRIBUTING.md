@@ -74,6 +74,15 @@ Recommended branch protection addition:
 
 1. Require status check: `Secret Scan / Gitleaks`.
 
+## Screenshot refresh
+
+Use the automated capture flow to regenerate README screenshots from a seeded demo workspace.
+
+1. Install the Playwright browser once: `npm run screenshots:install`
+2. Capture fresh screenshots: `npm run screenshots:capture`
+
+Generated assets are written to `docs/screenshots/`.
+
 ## Release workflow
 
 GitHub Actions workflow: `.github/workflows/release.yml`

@@ -1,11 +1,13 @@
 # WorkWindow
 
-WorkWindow is a local-first planning app that unifies calendar scheduling, Kanban execution, and workload visibility in one interface.
+WorkWindow started as a personal frustration: my to-do list knew what existed, my calendar knew when things were happening, and my Kanban board knew what was moving, but none of them helped me plan real execution in one flow.
 
-It is designed to answer a practical productivity gap: tasks, dates, and execution status usually live in separate tools. WorkWindow brings them together with dependency and risk context so planning and delivery decisions happen in one place.
+I built this to feel human and practical: one workspace where commitments, workload, and progress are visible together. The goal is simple, make weekly planning and day-to-day execution easier without juggling three disconnected tools.
 
-![WorkWindow launch modes](docs/screenshots/mode-chooser.svg)
-![WorkWindow board overview](docs/screenshots/board-overview.svg)
+Under the hood, WorkWindow is a local-first planning app that unifies calendar scheduling, Kanban execution, and workload visibility, with an optional path to authenticated cloud sync.
+
+![WorkWindow calendar overview](docs/screenshots/calendar-overview.png)
+![WorkWindow board overview](docs/screenshots/board-overview.png)
 
 ## Why This Project Matters
 
