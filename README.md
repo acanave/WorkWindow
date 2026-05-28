@@ -87,6 +87,11 @@ If you run personal automations (for example OpenClaw + Telegram), keep that in 
 
 Secret scanning runs in CI on every push and pull request to `main`.
 
+## Trust and Policies
+
+- Security policy: [SECURITY.md](./SECURITY.md)
+- Privacy notice: [PRIVACY.md](./PRIVACY.md)
+
 ## Product Highlights
 
 - Kanban board with Backlog, In Progress, Blocked, and Done lanes
