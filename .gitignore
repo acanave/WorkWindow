@@ -8,3 +8,5 @@ workwindow-export.json
 .env.local
 .env.*.local
 .vercel
+playwright-report
+test-results

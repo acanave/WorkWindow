@@ -24,6 +24,39 @@ function makeState(cardOverrides = {}) {
 }
 
 describe('store reducer', () => {
+  it('adds a calendar block when creating a card with a due date', () => {
+    const state = { ...makeState(), cards: [] }
+    const next = reducer(state, {
+      type: 'CARD_CREATE',
+      payload: {
+        title: 'Scheduled task',
+        due_date: '2026-03-15',
+      },
+    })
+
+    expect(next.cards).toHaveLength(1)
+    expect(next.cards[0].due_date).toBe('2026-03-15')
+    expect(next.cards[0].planned_day_blocks).toHaveLength(1)
+    expect(next.cards[0].planned_day_blocks[0]).toMatchObject({
+      date: '2026-03-15',
+      points: 1,
+    })
+  })
+
+  it('does not add a calendar block when creating a card without a due date', () => {
+    const state = { ...makeState(), cards: [] }
+    const next = reducer(state, {
+      type: 'CARD_CREATE',
+      payload: {
+        title: 'Unscheduled task',
+      },
+    })
+
+    expect(next.cards).toHaveLength(1)
+    expect(next.cards[0].due_date).toBeNull()
+    expect(next.cards[0].planned_day_blocks).toHaveLength(0)
+  })
+
   it('does not allow moving incomplete cards to Done', () => {
     const state = makeState({ completed_points: 2 })
     const next = reducer(state, {
