@@ -13,7 +13,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepush:verify": "npm run test && npm run build"
+    "prepush:verify": "npm run test && npm run build",
+    "screenshots:install": "playwright install chromium",
+    "screenshots:capture": "playwright test -c playwright.screenshots.config.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",

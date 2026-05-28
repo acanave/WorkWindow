@@ -9,7 +9,7 @@ const StoreContext = createContext(null)
 export function reducer(state, action) {
   switch (action.type) {
     case 'CARD_CREATE': {
-      const nextCard = createDefaultCard({ ...action.payload, id: createId('c') })
+      const nextCard = createCardForCreation(action.payload)
       return {
         ...state,
         cards: [nextCard, ...state.cards],
@@ -153,4 +153,17 @@ function initializeState() {
   }
 
   return loadState() || createInitialState()
+}
+
+function createCardForCreation(payload = {}) {
+  const nextCard = createDefaultCard({ ...payload, id: createId('c') })
+
+  if (nextCard.due_date && nextCard.planned_day_blocks.length === 0) {
+    return {
+      ...nextCard,
+      planned_day_blocks: [{ id: createId('b'), date: nextCard.due_date, points: 1 }],
+    }
+  }
+
+  return nextCard
 }

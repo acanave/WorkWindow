@@ -1,0 +1,85 @@
+{
+  "version": 2,
+  "ui": {
+    "selectedDate": "2026-04-11"
+  },
+  "cards": [
+    {
+      "id": "c1",
+      "title": "Polish launch mode copy",
+      "description": "Tighten local vs cloud messaging and CTA hierarchy for the first-run experience.",
+      "status": "Backlog",
+      "estimate_points": 3,
+      "due_date": "2026-04-18",
+      "dependencies": ["c2"],
+      "planned_day_blocks": [{ "id": "b1", "date": "2026-04-16", "points": 1 }],
+      "completed_points": 0,
+      "progress_log": []
+    },
+    {
+      "id": "c2",
+      "title": "Cloud sync landing copy",
+      "description": "Update cloud setup language to feel clearer and more production-ready.",
+      "status": "In Progress",
+      "estimate_points": 5,
+      "due_date": "2026-04-11",
+      "dependencies": [],
+      "planned_day_blocks": [
+        { "id": "b2", "date": "2026-04-10", "points": 1 },
+        { "id": "b3", "date": "2026-04-11", "points": 1 }
+      ],
+      "completed_points": 2,
+      "progress_log": [
+        { "id": "p1", "date": "2026-04-09", "delta": 1 },
+        { "id": "p2", "date": "2026-04-10", "delta": 1 }
+      ]
+    },
+    {
+      "id": "c3",
+      "title": "Capture clean screenshots",
+      "description": "Produce README-ready imagery from a seeded demo workspace.",
+      "status": "Blocked",
+      "estimate_points": 2,
+      "due_date": "2026-04-12",
+      "dependencies": ["c2"],
+      "planned_day_blocks": [{ "id": "b4", "date": "2026-04-11", "points": 1 }],
+      "completed_points": 1,
+      "progress_log": [{ "id": "p3", "date": "2026-04-10", "delta": 1 }]
+    },
+    {
+      "id": "c4",
+      "title": "README portfolio refresh",
+      "description": "Trim operational detail and sharpen product framing for portfolio readers.",
+      "status": "Done",
+      "estimate_points": 5,
+      "due_date": "2026-04-13",
+      "dependencies": [],
+      "planned_day_blocks": [
+        { "id": "b5", "date": "2026-04-09", "points": 1 },
+        { "id": "b6", "date": "2026-04-10", "points": 2 },
+        { "id": "b7", "date": "2026-04-11", "points": 2 }
+      ],
+      "completed_points": 5,
+      "progress_log": [
+        { "id": "p4", "date": "2026-04-07", "delta": 2 },
+        { "id": "p5", "date": "2026-04-08", "delta": 1 },
+        { "id": "p6", "date": "2026-04-09", "delta": 2 }
+      ]
+    },
+    {
+      "id": "c5",
+      "title": "Calendar workload legend",
+      "description": "Make anchor tasks and supporting windows easier to scan at a glance.",
+      "status": "In Progress",
+      "estimate_points": 3,
+      "due_date": "2026-04-20",
+      "dependencies": [],
+      "planned_day_blocks": [
+        { "id": "b8", "date": "2026-04-11", "points": 1 },
+        { "id": "b9", "date": "2026-04-14", "points": 1 }
+      ],
+      "completed_points": 1,
+      "progress_log": [{ "id": "p7", "date": "2026-04-08", "delta": 1 }]
+    }
+  ]
+}

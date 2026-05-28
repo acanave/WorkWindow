@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import TaskCard from './TaskCard'
 
 export default function KanbanColumn({
@@ -13,6 +14,8 @@ export default function KanbanColumn({
   onLogProgress,
   onPlanCardToSelectedDate,
 }) {
+  const [expandedCardId, setExpandedCardId] = useState(null)
+
   const handleDragOver = (event) => {
     event.preventDefault()
   }
@@ -22,6 +25,10 @@ export default function KanbanColumn({
     const cardId = event.dataTransfer.getData('application/workwindow-card-id')
     if (!cardId) return
     onMoveCard(cardId, status)
+  }
+
+  const toggleExpandedCard = (cardId) => {
+    setExpandedCardId((current) => (current === cardId ? null : cardId))
   }
 
   return (
@@ -39,21 +46,27 @@ export default function KanbanColumn({
         <span className="flex items-center gap-1 text-sm text-[color:var(--ww-muted)]">{sumCards(cards)}pt</span>
       </div>
       <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
-        {cards.map((card) => (
-          <TaskCard
-            key={card.id}
-            card={card}
-            selectedDate={selectedDate}
-            unresolvedDependencyCount={unresolvedMap[card.id] || 0}
-            chainDepth={chainDepthByCardId[card.id] || 0}
-            hasDependencyCycle={hasCycleByCardId[card.id] || false}
-            risk={riskByCardId[card.id] || null}
-            onOpen={() => onOpenCard(card.id)}
-            onMoveCard={onMoveCard}
-            onLogProgress={onLogProgress}
-            onPlanSelectedDate={onPlanCardToSelectedDate}
-          />
-        ))}
+        {cards.map((card) => {
+          const expanded = expandedCardId === card.id
+
+          return (
+            <TaskCard
+              key={card.id}
+              card={card}
+              expanded={expanded}
+              selectedDate={selectedDate}
+              unresolvedDependencyCount={unresolvedMap[card.id] || 0}
+              chainDepth={chainDepthByCardId[card.id] || 0}
+              hasDependencyCycle={hasCycleByCardId[card.id] || false}
+              risk={riskByCardId[card.id] || null}
+              onToggleExpand={() => toggleExpandedCard(card.id)}
+              onOpen={() => onOpenCard(card.id)}
+              onMoveCard={onMoveCard}
+              onLogProgress={onLogProgress}
+              onPlanSelectedDate={onPlanCardToSelectedDate}
+            />
+          )
+        })}
         {cards.length === 0 && (
           <div className="rounded-xl border border-dashed border-[color:var(--ww-border)] bg-[color:var(--ww-soft-panel-bg)] px-4 py-8 text-center text-sm text-[color:var(--ww-muted)]">
             Move cards here to change status.

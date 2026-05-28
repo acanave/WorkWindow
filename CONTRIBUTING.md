@@ -56,6 +56,33 @@ Build artifact policy:
 
 - CI uploads `dist` as an artifact only for pushes to `main`.
 
+## Secret scanning
+
+GitHub Actions workflow: `.github/workflows/secret-scan.yml`
+
+Triggers:
+
+- Every push to any branch
+- Every pull request targeting `main`
+
+Behavior:
+
+- Runs Gitleaks against the repository history and current tree.
+- Fails the workflow if a potential secret is detected.
+
+Recommended branch protection addition:
+
+1. Require status check: `Secret Scan / Gitleaks`.
+
+## Screenshot refresh
+
+Use the automated capture flow to regenerate README screenshots from a seeded demo workspace.
+
+1. Install the Playwright browser once: `npm run screenshots:install`
+2. Capture fresh screenshots: `npm run screenshots:capture`
+
+Generated assets are written to `docs/screenshots/`.
+
 ## Release workflow
 
 GitHub Actions workflow: `.github/workflows/release.yml`
