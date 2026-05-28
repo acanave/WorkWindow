@@ -69,6 +69,24 @@ Notes:
 - `RLS-backed user_states` row model for cloud sync
 - `vercel.json` security headers for hosted deployments
 
+## Repository Boundaries
+
+WorkWindow is maintained as a public product repository. Keep this repository focused on product code and public-safe defaults.
+
+- Include: UI, app logic, tests, docs, schema, migration scripts, sample data.
+- Exclude: personal secrets, bot tokens, private deployment credentials, personal automation scripts, exported personal task data.
+
+If you run personal automations (for example OpenClaw + Telegram), keep that in a separate private repository and integrate through API/webhook contracts rather than embedding private credentials in this repo.
+
+### Data and secret handling
+
+- Store live app data in runtime storage (browser storage, Supabase, or your backend database), not in git.
+- Keep only placeholders in `.env.example`.
+- Keep `.env.local` untracked.
+- Never expose server-only keys (such as Supabase service-role keys) in Vite environment variables.
+
+Secret scanning runs in CI on every push and pull request to `main`.
+
 ## Product Highlights
 
 - Kanban board with Backlog, In Progress, Blocked, and Done lanes
@@ -138,3 +156,11 @@ State is stored locally with key `workwindow:data:v2`. When cloud sync is config
 ## Development Notes
 
 Developer workflow and repository checks live in [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+### Recommended branch workflow
+
+1. Branch from `main` for each feature or fix.
+2. Keep changes scoped and include tests with behavior changes.
+3. Open a pull request into `main`.
+4. Require passing checks (`CI / Validate`, `Secret Scan / Gitleaks`) before merge.
+5. Use release tags (`vX.Y.Z`) from `main` only.
