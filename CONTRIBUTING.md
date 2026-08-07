@@ -83,6 +83,15 @@ Use the automated capture flow to regenerate README screenshots from a seeded de
 
 Generated assets are written to `docs/screenshots/`.
 
+## End-to-end smoke tests
+
+The Playwright smoke suite covers the critical local-first workflow: launch, create, edit, move, schedule, and reload with persisted state.
+
+1. Install Chromium once: `npm run screenshots:install`
+2. Run the smoke suite: `npm run test:e2e`
+
+CI caches the Playwright browser and retains traces, screenshots, videos, and the HTML report when the smoke suite fails.
+
 ## Release workflow
 
 GitHub Actions workflow: `.github/workflows/release.yml`
