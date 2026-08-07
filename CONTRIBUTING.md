@@ -50,7 +50,7 @@ Node version resolution:
 
 - `.nvmrc` first
 - `package.json` `engines.node` second
-- fallback to Node 20
+- fallback to Node 24
 
 Build artifact policy:
 
