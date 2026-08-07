@@ -68,7 +68,7 @@ jobs:
             fi
           fi
 
-          echo "version=20" >> "$GITHUB_OUTPUT"
+          echo "version=24" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
