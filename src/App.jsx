@@ -173,14 +173,14 @@ function WorkWindowApp({
   }
 
   return (
-    <div className="min-h-screen p-3 text-[color:var(--ww-text)] [background:var(--ww-app-bg)]">
+    <div className="min-h-screen p-0 text-[color:var(--ww-text)] [background:var(--ww-app-bg)] sm:p-3">
       <a
         href="#main-content"
         className="ww-button ww-button-primary sr-only fixed left-4 top-4 z-[60] px-4 py-2 focus:not-sr-only"
       >
         Skip to main content
       </a>
-      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1760px] overflow-hidden rounded-2xl border border-[color:var(--ww-border)] [background:var(--ww-shell-bg)] shadow-sm">
+      <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col overflow-hidden [background:var(--ww-shell-bg)] shadow-sm sm:min-h-[calc(100vh-1.5rem)] sm:rounded-2xl sm:border sm:border-[color:var(--ww-border)] md:flex-row">
         <AppHeader
           activeView={activeView}
           onChangeView={setActiveView}
@@ -196,7 +196,7 @@ function WorkWindowApp({
           syncStatus={syncErrorMessage ? 'error' : syncStatus}
         />
 
-        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 px-4 py-5 md:px-7">
+        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 px-3 py-4 sm:px-4 sm:py-5 md:px-7">
           {syncErrorMessage && (
             <section className="mb-5 rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-950 shadow-sm dark:border-amber-400/25 dark:bg-amber-950/30 dark:text-amber-100">
               <div className="font-semibold">Cloud sync unavailable. Running in local mode.</div>
@@ -209,7 +209,7 @@ function WorkWindowApp({
 
           <section className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <h1 className="ww-page-title max-w-5xl text-2xl font-semibold leading-tight tracking-normal md:text-[29px]">
+              <h1 className="ww-page-title max-w-5xl text-xl font-semibold leading-tight tracking-normal sm:text-2xl md:text-[29px]">
                 {activeView === 'calendar' ? (
                   <>
                     See not just what is scheduled. See <span className="ww-title-accent">what it takes</span> to make

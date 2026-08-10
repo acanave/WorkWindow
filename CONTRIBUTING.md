@@ -85,7 +85,7 @@ Generated assets are written to `docs/screenshots/`.
 
 ## End-to-end browser tests
 
-The Playwright suite covers the critical local-first workflow—launch, create, edit, move, schedule, and reload with persisted state—and enforces a WCAG A/AA accessibility baseline across primary desktop and mobile views.
+The Playwright suite covers the critical local-first workflow—launch, create, edit, move, schedule, and reload with persisted state—and enforces a WCAG A/AA accessibility baseline across primary desktop and mobile views. Its mobile journey also verifies the compact navigation, contained calendar scrolling, viewport-safe modal, and absence of page-level horizontal overflow.
 
 1. Install Chromium once: `npm run screenshots:install`
 2. Run the smoke suite: `npm run test:e2e`

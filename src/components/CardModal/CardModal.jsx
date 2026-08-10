@@ -105,7 +105,7 @@ export default function CardModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/45 p-3 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -113,7 +113,7 @@ export default function CardModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="card-modal-title"
-        className="w-full max-w-xl rounded-2xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-5 shadow-2xl"
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-xl overflow-y-auto rounded-2xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-4 shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:p-5"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">

@@ -178,58 +178,60 @@ export default function MonthCalendar({
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_294px]">
-        <section className="ww-card overflow-hidden">
-          <div className="grid grid-cols-7 border-b border-[color:var(--ww-border-soft)] text-center text-xs font-semibold uppercase tracking-wide text-[color:var(--ww-muted)] [background:var(--ww-soft-panel-bg)]">
-            <div className="py-4">Sun</div>
-            <div className="py-4">Mon</div>
-            <div className="py-4">Tue</div>
-            <div className="py-4">Wed</div>
-            <div className="py-4">Thu</div>
-            <div className="py-4">Fri</div>
-            <div className="py-4">Sat</div>
-          </div>
+        <section role="region" aria-label="Month calendar grid" tabIndex={0} className="ww-card overflow-x-auto">
+          <div className="min-w-[720px]">
+            <div className="grid grid-cols-7 border-b border-[color:var(--ww-border-soft)] text-center text-xs font-semibold uppercase tracking-wide text-[color:var(--ww-muted)] [background:var(--ww-soft-panel-bg)]">
+              <div className="py-4">Sun</div>
+              <div className="py-4">Mon</div>
+              <div className="py-4">Tue</div>
+              <div className="py-4">Wed</div>
+              <div className="py-4">Thu</div>
+              <div className="py-4">Fri</div>
+              <div className="py-4">Sat</div>
+            </div>
 
-          <div>
-            {weeks.map((week, weekIndex) => (
-              <div
-                key={week[0].dateKey}
-                className="relative grid grid-cols-7"
-                style={{
-                  paddingBottom: `${getWindowStackPadding(windowRowsByWeek[weekIndex]?.length || 0)}px`,
-                }}
-              >
-                {week.map((day) => (
-                  <DayCell
-                    key={day.dateKey}
-                    day={day}
-                    selected={day.dateKey === selectedDate}
-                    inDragRange={Boolean(
-                      selectedRange && day.dateKey >= selectedRange.start && day.dateKey <= selectedRange.end,
-                    )}
-                    anchors={anchorsByDate[day.dateKey] || []}
-                    cardMetaById={cardMetaById}
-                    onSelect={onSelectDate}
-                    onStartRange={startRange}
-                    onExtendRange={extendRange}
-                    onFinishRange={finishRange}
-                    onDropCard={onDropCard}
-                  />
-                ))}
-                <div className="pointer-events-none absolute inset-x-0 top-[58px] z-20 flex flex-col px-3">
-                  {(windowRowsByWeek[weekIndex] || []).map((row, rowIndex) => (
-                    <div
-                      key={rowIndex}
-                      className="grid grid-cols-7 gap-0"
-                      style={{ marginTop: rowIndex === 0 ? 0 : `${WINDOW_ROW_GAP}px` }}
-                    >
-                      {row.map((segment) => (
-                        <WindowSpan key={segment.id} segment={segment} onOpenCard={onOpenCard} />
-                      ))}
-                    </div>
+            <div>
+              {weeks.map((week, weekIndex) => (
+                <div
+                  key={week[0].dateKey}
+                  className="relative grid grid-cols-7"
+                  style={{
+                    paddingBottom: `${getWindowStackPadding(windowRowsByWeek[weekIndex]?.length || 0)}px`,
+                  }}
+                >
+                  {week.map((day) => (
+                    <DayCell
+                      key={day.dateKey}
+                      day={day}
+                      selected={day.dateKey === selectedDate}
+                      inDragRange={Boolean(
+                        selectedRange && day.dateKey >= selectedRange.start && day.dateKey <= selectedRange.end,
+                      )}
+                      anchors={anchorsByDate[day.dateKey] || []}
+                      cardMetaById={cardMetaById}
+                      onSelect={onSelectDate}
+                      onStartRange={startRange}
+                      onExtendRange={extendRange}
+                      onFinishRange={finishRange}
+                      onDropCard={onDropCard}
+                    />
                   ))}
+                  <div className="pointer-events-none absolute inset-x-0 top-[58px] z-20 flex flex-col px-3">
+                    {(windowRowsByWeek[weekIndex] || []).map((row, rowIndex) => (
+                      <div
+                        key={rowIndex}
+                        className="grid grid-cols-7 gap-0"
+                        style={{ marginTop: rowIndex === 0 ? 0 : `${WINDOW_ROW_GAP}px` }}
+                      >
+                        {row.map((segment) => (
+                          <WindowSpan key={segment.id} segment={segment} onOpenCard={onOpenCard} />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
