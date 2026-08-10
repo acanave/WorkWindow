@@ -212,7 +212,7 @@ function NavUtilityButton({ label, detail, onClick }) {
       className="flex w-full items-center justify-between rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-[color:var(--ww-muted)] hover:border-[color:var(--ww-border-soft)] hover:bg-[color:var(--ww-panel-bg)] hover:text-[color:var(--ww-heading)]"
     >
       <span>{label}</span>
-      {detail && <span className="text-xs text-slate-400">{detail}</span>}
+      {detail && <span className="text-xs text-[color:var(--ww-muted)]">{detail}</span>}
     </button>
   )
 }
