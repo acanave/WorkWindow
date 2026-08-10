@@ -1,3 +1,5 @@
+const DAY_LABEL_FORMATTER = new Intl.DateTimeFormat(undefined, { dateStyle: 'full' })
+
 export default function DayCell({
   day,
   selected,
@@ -25,9 +27,14 @@ export default function DayCell({
     <div
       role="button"
       tabIndex={0}
+      aria-current={selected ? 'date' : undefined}
+      aria-label={`Select ${DAY_LABEL_FORMATTER.format(day.date)}`}
       onClick={() => onSelect(day.dateKey)}
       onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') onSelect(day.dateKey)
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onSelect(day.dateKey)
+        }
       }}
       onMouseDown={(event) => {
         if (event.button !== 0) return

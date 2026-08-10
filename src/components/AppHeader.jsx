@@ -45,13 +45,16 @@ export default function AppHeader({
   }
 
   return (
-    <aside className="flex w-[224px] shrink-0 flex-col border-r border-[color:var(--ww-border)] px-4 py-5 [background:var(--ww-soft-panel-bg)]">
+    <aside
+      aria-label="Workspace navigation"
+      className="flex w-[224px] shrink-0 flex-col border-r border-[color:var(--ww-border)] px-4 py-5 [background:var(--ww-soft-panel-bg)]"
+    >
       <div className="mb-8 flex items-center gap-3 px-1">
         <BrandMark />
         <span className="text-xl font-semibold tracking-normal text-[color:var(--ww-heading)]">WorkWindow</span>
       </div>
 
-      <nav className="space-y-1">
+      <nav aria-label="Primary" className="space-y-1">
         {NAV_ITEMS.map((item) => {
           const active = activeView === item.id
           return (

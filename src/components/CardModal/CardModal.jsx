@@ -1,5 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { STATUSES } from '../../state/schema'
+
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 export default function CardModal({
   mode,
@@ -12,6 +15,8 @@ export default function CardModal({
   onDelete,
   onLogProgress,
 }) {
+  const dialogRef = useRef(null)
+  const titleInputRef = useRef(null)
   const [title, setTitle] = useState(card?.title || '')
   const [description, setDescription] = useState(card?.description || '')
   const [status, setStatus] = useState(card?.status || 'Backlog')
@@ -24,11 +29,38 @@ export default function CardModal({
   const [dependencies, setDependencies] = useState(card?.dependencies || [])
 
   useEffect(() => {
-    const onEsc = (event) => {
-      if (event.key === 'Escape') onClose()
+    const previouslyFocusedElement = document.activeElement
+    titleInputRef.current?.focus()
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onClose()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const focusableElements = Array.from(dialogRef.current?.querySelectorAll(FOCUSABLE_SELECTOR) || [])
+      if (focusableElements.length === 0) return
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault()
+        lastElement.focus()
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement.focus()
+      }
     }
-    window.addEventListener('keydown', onEsc)
-    return () => window.removeEventListener('keydown', onEsc)
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      previouslyFocusedElement?.focus?.()
+    }
   }, [onClose])
 
   const completion = useMemo(() => {
@@ -77,11 +109,15 @@ export default function CardModal({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="card-modal-title"
         className="w-full max-w-xl rounded-2xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-5 shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-[color:var(--ww-heading)]">
+          <h2 id="card-modal-title" className="text-lg font-semibold text-[color:var(--ww-heading)]">
             {mode === 'create' ? 'Create Work Item' : 'Edit Work Item'}
           </h2>
           <button onClick={onClose} className="ww-button px-2 py-1 text-sm">
@@ -93,6 +129,7 @@ export default function CardModal({
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Title</span>
             <input
+              ref={titleInputRef}
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               required
