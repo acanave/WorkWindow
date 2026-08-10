@@ -90,7 +90,9 @@ export default function KanbanBoard({
             </select>
             <button className="ww-button px-4 py-3 text-sm">Group</button>
             <button className="ww-button px-4 py-3 text-sm">View</button>
-            <button className="ww-button px-4 py-3 text-sm">...</button>
+            <button aria-label="Card view options" className="ww-button px-4 py-3 text-sm">
+              ...
+            </button>
           </div>
         </div>
         <div className="flex flex-wrap gap-1 border-b border-[color:var(--ww-border-soft)] px-4 py-3">

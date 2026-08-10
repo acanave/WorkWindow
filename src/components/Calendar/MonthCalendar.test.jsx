@@ -17,6 +17,18 @@ function makeProps(selectedDate) {
 }
 
 describe('MonthCalendar', () => {
+  it('selects calendar days from the keyboard', () => {
+    const onSelectDate = vi.fn()
+    render(<MonthCalendar {...makeProps('2026-03-10')} onSelectDate={onSelectDate} />)
+
+    const day = screen.getByRole('button', { name: /Select .*March 11, 2026/i })
+    fireEvent.keyDown(day, { key: 'Enter' })
+    fireEvent.keyDown(day, { key: ' ' })
+
+    expect(onSelectDate).toHaveBeenNthCalledWith(1, '2026-03-11')
+    expect(onSelectDate).toHaveBeenNthCalledWith(2, '2026-03-11')
+  })
+
   it('syncs visible month when selectedDate changes externally', () => {
     const { rerender } = render(<MonthCalendar {...makeProps('2026-03-10')} />)
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(monthLabel(parseDateKey('2026-03-10')))
