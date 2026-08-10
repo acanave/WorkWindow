@@ -149,7 +149,9 @@ export default function MonthCalendar({
           </button>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button className="ww-button px-5 py-3 text-sm">Month</button>
+          <button aria-label="Month calendar view" className="ww-button px-5 py-3 text-sm">
+            Month
+          </button>
           <div className="flex flex-wrap gap-1 rounded-lg border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-1">
             {STATUSES.map((status) => {
               const active = visibleStatuses.includes(status)
@@ -169,7 +171,9 @@ export default function MonthCalendar({
               )
             })}
           </div>
-          <button className="ww-button px-4 py-3 text-sm">...</button>
+          <button aria-label="Calendar options" className="ww-button px-4 py-3 text-sm">
+            ...
+          </button>
         </div>
       </div>
 

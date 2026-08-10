@@ -36,6 +36,34 @@ describe('CardModal', () => {
 
     expect(screen.getByRole('heading', { name: 'Blocked by' })).toBeInTheDocument()
     expect(screen.getByText('Task B (Blocked)')).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Edit Work Item' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Title')).toHaveFocus()
+  })
+
+  it('contains keyboard focus and closes with Escape', async () => {
+    const user = userEvent.setup()
+    const onClose = vi.fn()
+
+    render(
+      <CardModal
+        mode="create"
+        card={null}
+        allCards={[]}
+        onClose={onClose}
+        onCreate={vi.fn()}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        onLogProgress={vi.fn()}
+      />,
+    )
+
+    const closeButton = screen.getByRole('button', { name: 'Close' })
+    closeButton.focus()
+    await user.tab({ shift: true })
+    expect(screen.getByRole('button', { name: 'Create' })).toHaveFocus()
+
+    await user.keyboard('{Escape}')
+    expect(onClose).toHaveBeenCalledOnce()
   })
 
   it('saves a manual cross-day work window from range fields', async () => {

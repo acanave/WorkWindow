@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import AppHeader from './components/AppHeader'
 import AuthScreen from './components/Auth/AuthScreen'
 import MonthCalendar from './components/Calendar/MonthCalendar'
@@ -118,7 +118,7 @@ function WorkWindowApp({
 
   const openCreate = () => setModal({ open: true, mode: 'create', cardId: null })
   const openEdit = (cardId) => setModal({ open: true, mode: 'edit', cardId })
-  const closeModal = () => setModal({ open: false, mode: 'create', cardId: null })
+  const closeModal = useCallback(() => setModal({ open: false, mode: 'create', cardId: null }), [])
 
   const createCard = (payload) => dispatch({ type: 'CARD_CREATE', payload })
   const updateCard = (id, patch) => dispatch({ type: 'CARD_UPDATE', payload: { id, patch } })
@@ -174,6 +174,12 @@ function WorkWindowApp({
 
   return (
     <div className="min-h-screen p-3 text-[color:var(--ww-text)] [background:var(--ww-app-bg)]">
+      <a
+        href="#main-content"
+        className="ww-button ww-button-primary sr-only fixed left-4 top-4 z-[60] px-4 py-2 focus:not-sr-only"
+      >
+        Skip to main content
+      </a>
       <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1760px] overflow-hidden rounded-2xl border border-[color:var(--ww-border)] [background:var(--ww-shell-bg)] shadow-sm">
         <AppHeader
           activeView={activeView}
@@ -190,7 +196,7 @@ function WorkWindowApp({
           syncStatus={syncErrorMessage ? 'error' : syncStatus}
         />
 
-        <main className="min-w-0 flex-1 px-4 py-5 md:px-7">
+        <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 px-4 py-5 md:px-7">
           {syncErrorMessage && (
             <section className="mb-5 rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-950 shadow-sm dark:border-amber-400/25 dark:bg-amber-950/30 dark:text-amber-100">
               <div className="font-semibold">Cloud sync unavailable. Running in local mode.</div>

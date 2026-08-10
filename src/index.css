@@ -53,6 +53,11 @@ body {
   color: var(--ww-text);
 }
 
+:where(a, button, input, select, textarea, [role='button']):focus-visible {
+  outline: 3px solid var(--ww-accent);
+  outline-offset: 3px;
+}
+
 .ww-page-title {
   color: var(--ww-heading);
   text-wrap: balance;
