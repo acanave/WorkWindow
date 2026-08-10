@@ -50,7 +50,7 @@ export default function DayCell({
           : 'bg-[color:var(--ww-panel-bg)] hover:bg-[color:var(--ww-soft-panel-bg)]'
       } ${
         inDragRange ? 'bg-[color:var(--ww-accent-soft)] ring-2 ring-inset ring-[color:var(--ww-accent-border)]' : ''
-      } ${day.inCurrentMonth ? '' : 'bg-[color:var(--ww-soft-panel-bg)] text-[color:var(--ww-muted)] opacity-60'}`}
+      } ${day.inCurrentMonth ? '' : 'bg-[color:var(--ww-soft-panel-bg)] text-[color:var(--ww-muted)]'}`}
     >
       <div className="mb-3 flex items-center gap-2">
         <span
