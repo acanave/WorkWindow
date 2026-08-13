@@ -28,6 +28,8 @@ export default function CardModal({
   const [windowEnd, setWindowEnd] = useState(initialWindow.end)
   const [windowPoints, setWindowPoints] = useState(initialWindow.points)
   const [dependencies, setDependencies] = useState(card?.dependencies || [])
+  const [showScheduling, setShowScheduling] = useState(Boolean(initialWindow.start || initialWindow.end))
+  const [showDependencies, setShowDependencies] = useState((card?.dependencies || []).length > 0)
 
   useEffect(() => {
     const previouslyFocusedElement = document.activeElement
@@ -171,7 +173,7 @@ export default function CardModal({
             </label>
 
             <label>
-              <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Required window points</span>
+              <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Estimated effort</span>
               <input
                 type="number"
                 min={1}
@@ -179,10 +181,11 @@ export default function CardModal({
                 onChange={(event) => setEstimate(event.target.value)}
                 className="ww-input w-full px-2 py-2 text-sm"
               />
+              <span className="mt-1 block text-xs text-[color:var(--ww-muted)]">Planning points needed to finish.</span>
             </label>
 
             <label>
-              <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Anchor due date</span>
+              <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Deadline</span>
               <input
                 type="date"
                 value={dueDate}
@@ -192,63 +195,93 @@ export default function CardModal({
             </label>
           </div>
 
-          <fieldset className="rounded-xl border border-[color:var(--ww-accent-border)] bg-[color:var(--ww-accent-soft)] p-3">
-            <legend className="px-1 text-sm font-semibold text-[color:var(--ww-accent)]">Work window</legend>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <label>
-                <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Start</span>
-                <input
-                  type="date"
-                  value={windowStart}
-                  onChange={(event) => setWindowStart(event.target.value)}
-                  className="ww-input w-full px-2 py-2 text-sm"
-                />
-              </label>
-              <label>
-                <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">End</span>
-                <input
-                  type="date"
-                  value={windowEnd}
-                  onChange={(event) => setWindowEnd(event.target.value)}
-                  className="ww-input w-full px-2 py-2 text-sm"
-                />
-              </label>
-              <label>
-                <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Pts/day</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={8}
-                  value={windowPoints}
-                  onChange={(event) => setWindowPoints(event.target.value)}
-                  className="ww-input w-full px-2 py-2 text-sm"
-                />
-              </label>
-            </div>
-            <p className="mt-2 text-xs text-[color:var(--ww-accent)]">
-              These dates render as a horizontal allowed-work window on the calendar. The anchor due date remains the
-              deadline.
-            </p>
-          </fieldset>
+          <section className="rounded-xl border border-[color:var(--ww-border)] bg-[color:var(--ww-soft-panel-bg)]">
+            <button
+              type="button"
+              aria-expanded={showScheduling}
+              onClick={() => setShowScheduling((isVisible) => !isVisible)}
+              className="flex w-full items-center justify-between px-3 py-3 text-left text-sm font-semibold text-[color:var(--ww-heading)]"
+            >
+              <span>
+                Schedule work time <span className="font-normal text-[color:var(--ww-muted)]">(optional)</span>
+              </span>
+              <span aria-hidden="true">{showScheduling ? '−' : '+'}</span>
+            </button>
+            {showScheduling && (
+              <div className="border-t border-[color:var(--ww-border)] bg-[color:var(--ww-accent-soft)] p-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <label>
+                    <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Start</span>
+                    <input
+                      type="date"
+                      value={windowStart}
+                      onChange={(event) => setWindowStart(event.target.value)}
+                      className="ww-input w-full px-2 py-2 text-sm"
+                    />
+                  </label>
+                  <label>
+                    <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">End</span>
+                    <input
+                      type="date"
+                      value={windowEnd}
+                      onChange={(event) => setWindowEnd(event.target.value)}
+                      className="ww-input w-full px-2 py-2 text-sm"
+                    />
+                  </label>
+                  <label>
+                    <span className="mb-1 block text-sm font-medium text-[color:var(--ww-text)]">Pts/day</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={8}
+                      value={windowPoints}
+                      onChange={(event) => setWindowPoints(event.target.value)}
+                      className="ww-input w-full px-2 py-2 text-sm"
+                    />
+                  </label>
+                </div>
+                <p className="mt-2 text-xs text-[color:var(--ww-accent)]">
+                  Add a date range only when you want to reserve time on the calendar. Your deadline stays separate.
+                </p>
+              </div>
+            )}
+          </section>
 
-          <fieldset>
-            <legend className="mb-1 text-sm font-medium text-[color:var(--ww-text)]">Dependencies</legend>
-            <div className="max-h-24 space-y-1 overflow-y-auto rounded border border-[color:var(--ww-border)] bg-[color:var(--ww-soft-panel-bg)] p-2">
-              {dependencyOptions.length === 0 && (
-                <p className="text-sm text-[color:var(--ww-muted)]">No cards available.</p>
-              )}
-              {dependencyOptions.map((dep) => (
-                <label key={dep.id} className="flex items-center gap-2 text-sm text-[color:var(--ww-text)]">
-                  <input
-                    type="checkbox"
-                    checked={dependencies.includes(dep.id)}
-                    onChange={() => handleDependencyToggle(dep.id)}
-                  />
-                  <span>{dep.title}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <section className="rounded-xl border border-[color:var(--ww-border)] bg-[color:var(--ww-soft-panel-bg)]">
+            <button
+              type="button"
+              aria-expanded={showDependencies}
+              onClick={() => setShowDependencies((isVisible) => !isVisible)}
+              className="flex w-full items-center justify-between px-3 py-3 text-left text-sm font-semibold text-[color:var(--ww-heading)]"
+            >
+              <span>
+                Dependencies <span className="font-normal text-[color:var(--ww-muted)]">(optional)</span>
+              </span>
+              <span aria-hidden="true">{showDependencies ? '−' : '+'}</span>
+            </button>
+            {showDependencies && (
+              <div className="border-t border-[color:var(--ww-border)] p-3">
+                <p className="mb-2 text-xs text-[color:var(--ww-muted)]">
+                  Choose work items that must be finished first.
+                </p>
+                <div className="max-h-24 space-y-1 overflow-y-auto rounded border border-[color:var(--ww-border)] bg-[color:var(--ww-soft-panel-bg)] p-2">
+                  {dependencyOptions.length === 0 && (
+                    <p className="text-sm text-[color:var(--ww-muted)]">No cards available.</p>
+                  )}
+                  {dependencyOptions.map((dep) => (
+                    <label key={dep.id} className="flex items-center gap-2 text-sm text-[color:var(--ww-text)]">
+                      <input
+                        type="checkbox"
+                        checked={dependencies.includes(dep.id)}
+                        onChange={() => handleDependencyToggle(dep.id)}
+                      />
+                      <span>{dep.title}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
 
           {(mode === 'edit' || unresolvedSelectedDependencies.length > 0) && (
             <section className="rounded-xl border border-amber-200 bg-amber-50 p-2 dark:border-amber-800 dark:bg-amber-950/50">
@@ -289,7 +322,7 @@ export default function CardModal({
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="sticky bottom-0 -mx-4 flex items-center justify-between border-t border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] px-4 pb-1 pt-3 sm:-mx-5 sm:px-5">
             {mode === 'edit' ? (
               <button
                 type="button"
