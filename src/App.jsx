@@ -71,7 +71,7 @@ function WorkWindowApp({
   syncErrorMessage = '',
 }) {
   const { state, dispatch } = useStore()
-  const [modal, setModal] = useState({ open: false, mode: 'create', cardId: null })
+  const [modal, setModal] = useState({ open: false, mode: 'create', cardId: null, initialDate: null })
   const [activeView, setActiveView] = useState('calendar')
   const [syncStatus, setSyncStatus] = useState('saved')
   const [theme, setTheme] = useState(() => {
@@ -116,9 +116,10 @@ function WorkWindowApp({
 
   const selectedCard = state.cards.find((card) => card.id === modal.cardId) || null
 
-  const openCreate = () => setModal({ open: true, mode: 'create', cardId: null })
-  const openEdit = (cardId) => setModal({ open: true, mode: 'edit', cardId })
-  const closeModal = useCallback(() => setModal({ open: false, mode: 'create', cardId: null }), [])
+  const openCreate = () => setModal({ open: true, mode: 'create', cardId: null, initialDate: null })
+  const openCreateForDate = (initialDate) => setModal({ open: true, mode: 'create', cardId: null, initialDate })
+  const openEdit = (cardId) => setModal({ open: true, mode: 'edit', cardId, initialDate: null })
+  const closeModal = useCallback(() => setModal({ open: false, mode: 'create', cardId: null, initialDate: null }), [])
 
   const createCard = (payload) => dispatch({ type: 'CARD_CREATE', payload })
   const updateCard = (id, patch) => dispatch({ type: 'CARD_UPDATE', payload: { id, patch } })
@@ -233,6 +234,7 @@ function WorkWindowApp({
               onSelectDate={setSelectedDate}
               onDropCard={addDayBlock}
               onCreateCardFromWindowRange={createCardFromWindowRange}
+              onCreateCardForDate={openCreateForDate}
               onOpenCard={openEdit}
               onUpdateBlock={updateDayBlock}
               onDeleteBlock={deleteDayBlock}
@@ -261,6 +263,7 @@ function WorkWindowApp({
         <CardModal
           mode={modal.mode}
           card={selectedCard}
+          initialDate={modal.initialDate}
           allCards={state.cards}
           blockedBy={selectedCard ? dependencyInsights.blockedByByCardId[selectedCard.id] || [] : []}
           onClose={closeModal}

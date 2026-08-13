@@ -52,8 +52,8 @@ export default function KanbanBoard({
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_254px]">
       <section className="min-w-0 overflow-hidden rounded-xl border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)]">
-        <div className="flex flex-col gap-3 border-b border-[color:var(--ww-border-soft)] p-4 [background:var(--ww-soft-panel-bg)] xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-1 flex-col gap-3 lg:flex-row">
+        <div className="flex flex-col gap-3 border-b border-[color:var(--ww-border-soft)] p-4 [background:var(--ww-soft-panel-bg)] sm:flex-row sm:items-center">
+          <div className="flex flex-1 flex-col gap-3 sm:flex-row">
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -61,38 +61,17 @@ export default function KanbanBoard({
               aria-label="Search cards"
               className="ww-input min-w-[220px] flex-1 px-4 py-3 text-sm"
             />
-            <div className="flex flex-wrap items-center gap-2">
-              <button className="ww-button px-4 py-3 text-sm">Filter</button>
-              <select
-                value={sortBy}
-                onChange={(event) => setSortBy(event.target.value)}
-                aria-label="Sprint window"
-                className="ww-button px-4 py-3 text-sm"
-              >
-                <option value="manual">Sprint: Created order</option>
-                <option value="due_asc">Sort: Due date (earliest first)</option>
-                <option value="due_desc">Sort: Due date (latest first)</option>
-                <option value="progress_desc">Sort: Progress (highest first)</option>
-              </select>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
             <select
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value)}
               aria-label="Sort cards"
               className="ww-button px-4 py-3 text-sm"
             >
-              <option value="manual">Sort</option>
-              <option value="due_asc">Due date</option>
-              <option value="due_desc">Latest due</option>
-              <option value="progress_desc">Progress</option>
+              <option value="manual">Created order</option>
+              <option value="due_asc">Due date: soonest</option>
+              <option value="due_desc">Due date: latest</option>
+              <option value="progress_desc">Progress: highest</option>
             </select>
-            <button className="ww-button px-4 py-3 text-sm">Group</button>
-            <button className="ww-button px-4 py-3 text-sm">View</button>
-            <button aria-label="Card view options" className="ww-button px-4 py-3 text-sm">
-              ...
-            </button>
           </div>
         </div>
         <div className="flex flex-wrap gap-1 border-b border-[color:var(--ww-border-soft)] px-4 py-3">

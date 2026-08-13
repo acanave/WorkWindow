@@ -103,4 +103,54 @@ describe('CardModal', () => {
       }),
     )
   })
+
+  it('prefills the deadline when creating from a selected calendar date', () => {
+    render(
+      <CardModal
+        mode="create"
+        card={null}
+        initialDate="2026-05-11"
+        allCards={[]}
+        onClose={vi.fn()}
+        onCreate={vi.fn()}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        onLogProgress={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByLabelText('Anchor due date')).toHaveValue('2026-05-11')
+  })
+
+  it('requires confirmation before deleting a work item', async () => {
+    const user = userEvent.setup()
+    const onDelete = vi.fn()
+    const onClose = vi.fn()
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+
+    render(
+      <CardModal
+        mode="edit"
+        card={makeCard()}
+        allCards={[makeCard()]}
+        blockedBy={[]}
+        onClose={onClose}
+        onCreate={vi.fn()}
+        onUpdate={vi.fn()}
+        onDelete={onDelete}
+        onLogProgress={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Delete Card' }))
+    expect(confirmSpy).toHaveBeenCalledWith('Delete “Task A”? This cannot be undone.')
+    expect(onDelete).not.toHaveBeenCalled()
+    expect(onClose).not.toHaveBeenCalled()
+
+    confirmSpy.mockReturnValue(true)
+    await user.click(screen.getByRole('button', { name: 'Delete Card' }))
+    expect(onDelete).toHaveBeenCalledWith('c1')
+    expect(onClose).toHaveBeenCalledOnce()
+    confirmSpy.mockRestore()
+  })
 })

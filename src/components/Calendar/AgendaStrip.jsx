@@ -8,6 +8,7 @@ export default function AgendaStrip({
   riskByCardId = {},
   onUpdateBlock,
   onDeleteBlock,
+  onCreateCardForDate,
 }) {
   const totalPoints = blocks.reduce((sum, block) => sum + block.points, 0)
   const primaryAnchor = anchors[0] || null
@@ -50,8 +51,16 @@ export default function AgendaStrip({
         </div>
       ) : (
         <div className="mb-5 rounded-2xl border border-dashed border-[color:var(--ww-border)] p-4 text-sm text-[color:var(--ww-muted)]">
-          No anchor task on this date. Drag across the calendar to create a new WorkWindow, or set an anchor due date in
-          a work item.
+          <p>
+            No deadline on this date yet. Create a work item here, or add a deadline while editing an existing item.
+          </p>
+          <button
+            type="button"
+            onClick={() => onCreateCardForDate?.(selectedDate)}
+            className="ww-button ww-button-primary mt-3 px-3 py-2 text-sm font-semibold"
+          >
+            Create work item for this date
+          </button>
         </div>
       )}
 
@@ -119,10 +128,10 @@ export default function AgendaStrip({
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ww-muted)]">
-              True time footprint
+              Estimated effort footprint
             </p>
             <p className="mt-1 text-sm text-[color:var(--ww-muted)]">
-              {Math.max(0.5, totalPoints / 8).toFixed(1)} days of real work
+              {totalPoints === 0 ? 'No effort planned yet' : `${(totalPoints / 8).toFixed(1)} estimated days`}
             </p>
           </div>
           <p className="text-2xl font-semibold text-[color:var(--ww-heading)]">{totalPoints}pt</p>

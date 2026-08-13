@@ -17,6 +17,7 @@ export default function MonthCalendar({
   onSelectDate,
   onDropCard,
   onCreateCardFromWindowRange,
+  onCreateCardForDate,
   onOpenCard,
   onUpdateBlock,
   onDeleteBlock,
@@ -149,9 +150,6 @@ export default function MonthCalendar({
           </button>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button aria-label="Month calendar view" className="ww-button px-5 py-3 text-sm">
-            Month
-          </button>
           <div className="flex flex-wrap gap-1 rounded-lg border border-[color:var(--ww-border)] bg-[color:var(--ww-panel-bg)] p-1">
             {STATUSES.map((status) => {
               const active = visibleStatuses.includes(status)
@@ -171,9 +169,6 @@ export default function MonthCalendar({
               )
             })}
           </div>
-          <button aria-label="Calendar options" className="ww-button px-4 py-3 text-sm">
-            ...
-          </button>
         </div>
       </div>
 
@@ -243,6 +238,7 @@ export default function MonthCalendar({
           riskByCardId={riskByCardId}
           onUpdateBlock={onUpdateBlock}
           onDeleteBlock={onDeleteBlock}
+          onCreateCardForDate={onCreateCardForDate}
         />
       </div>
 
@@ -271,7 +267,7 @@ function CalendarLegend() {
         </div>
       </div>
       <div className="border-[color:var(--ww-border)] md:border-l md:pl-5">
-        <p className="font-semibold text-[color:var(--ww-heading)]">True Time Footprint</p>
+        <p className="font-semibold text-[color:var(--ww-heading)]">Estimated Effort Footprint</p>
         <p className="text-[color:var(--ww-muted)]">Travel, prep, focus, setup, buffer</p>
       </div>
     </section>

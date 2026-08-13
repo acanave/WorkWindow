@@ -119,6 +119,16 @@ describe('MonthCalendar', () => {
     expect(screen.getByText('Short 3pt')).toBeInTheDocument()
   })
 
+  it('offers a touch-friendly create action for the selected date', async () => {
+    const user = userEvent.setup()
+    const onCreateCardForDate = vi.fn()
+
+    render(<MonthCalendar {...makeProps('2026-03-10')} onCreateCardForDate={onCreateCardForDate} />)
+
+    await user.click(screen.getByRole('button', { name: 'Create work item for this date' }))
+    expect(onCreateCardForDate).toHaveBeenCalledWith('2026-03-10')
+  })
+
   it('creates a new card window by dragging across calendar days', () => {
     const onCreateCardFromWindowRange = vi.fn()
     const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('Dragged window task')
