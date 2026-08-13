@@ -160,7 +160,7 @@ export default function TaskCard({
           }}
           className="rounded border border-[color:var(--ww-accent-border)] bg-[color:var(--ww-action-bg)] px-2 py-1 text-xs font-medium text-[color:var(--ww-accent)] hover:bg-[color:var(--ww-action-hover)]"
         >
-          Add window {selectedDate}
+          Plan for {selectedDate}
         </button>
       </div>
     </article>

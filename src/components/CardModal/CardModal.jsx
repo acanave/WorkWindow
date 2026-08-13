@@ -7,6 +7,7 @@ const FOCUSABLE_SELECTOR =
 export default function CardModal({
   mode,
   card,
+  initialDate = null,
   allCards,
   blockedBy = [],
   onClose,
@@ -21,7 +22,7 @@ export default function CardModal({
   const [description, setDescription] = useState(card?.description || '')
   const [status, setStatus] = useState(card?.status || 'Backlog')
   const [estimate, setEstimate] = useState(card?.estimate_points || 4)
-  const [dueDate, setDueDate] = useState(card?.due_date || '')
+  const [dueDate, setDueDate] = useState(card?.due_date || initialDate || '')
   const initialWindow = getInitialWindow(card)
   const [windowStart, setWindowStart] = useState(initialWindow.start)
   const [windowEnd, setWindowEnd] = useState(initialWindow.end)
@@ -100,6 +101,12 @@ export default function CardModal({
       onUpdate(card.id, payload)
     }
 
+    onClose()
+  }
+
+  const handleDelete = () => {
+    if (!window.confirm(`Delete “${card.title}”? This cannot be undone.`)) return
+    onDelete(card.id)
     onClose()
   }
 
@@ -286,10 +293,7 @@ export default function CardModal({
             {mode === 'edit' ? (
               <button
                 type="button"
-                onClick={() => {
-                  onDelete(card.id)
-                  onClose()
-                }}
+                onClick={handleDelete}
                 className="rounded border border-rose-300 px-3 py-2 text-sm text-rose-700 hover:bg-rose-50 dark:border-rose-800 dark:text-rose-200 dark:hover:bg-rose-950/40"
               >
                 Delete Card

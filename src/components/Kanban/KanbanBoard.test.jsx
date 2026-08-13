@@ -159,7 +159,7 @@ describe('KanbanBoard', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /add window 2026-03-10/i }))
+    await user.click(screen.getByRole('button', { name: /plan for 2026-03-10/i }))
 
     expect(onPlanCardToSelectedDate).toHaveBeenCalledWith('c1')
   })
