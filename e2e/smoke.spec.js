@@ -54,7 +54,7 @@ test('local workflow persists a planned card across reloads', async ({ page }) =
       .getByRole('heading', { name: 'In Progress', exact: true })
       .locator('xpath=ancestor::section')
     await expect(inProgressColumn.getByText(UPDATED_CARD_TITLE)).toBeVisible()
-    await page.getByRole('button', { name: `Add window ${SELECTED_DATE}` }).click()
+    await page.getByRole('button', { name: `Plan for ${SELECTED_DATE}` }).click()
 
     await page.getByRole('button', { name: 'Calendar' }).click()
     await expect(page.getByTitle(new RegExp(`Work window: ${UPDATED_CARD_TITLE}`)).first()).toBeVisible()
