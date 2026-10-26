@@ -84,6 +84,7 @@ export default function AuthScreen({ errorMessage }) {
         email: normalizedEmail,
         options: {
           emailRedirectTo: window.location.origin,
+          shouldCreateUser: false,
         },
       })
 
@@ -118,7 +119,7 @@ export default function AuthScreen({ errorMessage }) {
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">Secure Sync</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">WorkWindow</h1>
         <p className="mt-3 text-sm leading-6 text-[#c8d3e3]">
-          Sign in with a magic link to sync your workspace across devices using your own Supabase project.
+          Sign in with an email link to open your private workspace. Your work stays synced across devices.
         </p>
 
         {configError && (
@@ -153,7 +154,7 @@ export default function AuthScreen({ errorMessage }) {
                 ? 'Sending link...'
                 : cooldownRemainingSeconds > 0
                   ? `Wait ${cooldownRemainingSeconds}s`
-                  : 'Email Me a Magic Link'}
+                  : 'Email me a sign-in link'}
             </button>
           </form>
         )}
@@ -166,10 +167,7 @@ export default function AuthScreen({ errorMessage }) {
 
         {!configError && (
           <p className="mt-4 text-xs leading-5 text-[#8795aa]">
-            If a magic link sends you back here, check that the exact deployed URL is allowed in Supabase Redirect URLs
-            and open the link in the same browser or device that requested it. If Supabase shows an auth hook error,
-            inspect the Before User Created hook or email allowlist in the dashboard. The button is rate-limited to one
-            request per 60 seconds to match Supabase.
+            Open your sign-in email in this browser. Links can be used once; request a new one if yours has expired.
           </p>
         )}
       </section>
