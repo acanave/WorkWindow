@@ -76,7 +76,7 @@ Recommended branch protection addition:
 
 ## Screenshot refresh
 
-Use the automated capture flow to regenerate README screenshots from a seeded demo workspace.
+Use the automated capture flow to regenerate README screenshots from fictional redesigned fixtures in an isolated local workspace. Never capture a signed-in production account for public documentation.
 
 1. Install the Playwright browser once: `npm run screenshots:install`
 2. Capture fresh screenshots: `npm run screenshots:capture`
@@ -129,3 +129,9 @@ documented policy and use local enforcement below.
 2. Direct push override exists for emergencies only and must be deliberate:
    `ALLOW_MAIN_PUSH=1 git push ...`
 3. CI (`CI / Validate`) runs on pushes and pull requests to `main`.
+
+## Current and legacy source
+
+The redesigned runtime starts in `src/App.jsx` and `src/redesign`. Older planner components and reducer tests remain as legacy reference; their passing tests do not imply those old controls are exposed in the redesigned app. The screenshot command now captures Dashboard, Boards, Calendar, and Projects. The old mode chooser is not part of startup.
+
+Release workflow build archives are generic local-mode bundles unless cloud configuration is supplied at build time. They are not copies of the configured Vercel production deployment.

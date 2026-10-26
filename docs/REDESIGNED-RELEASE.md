@@ -1,4 +1,4 @@
-# WorkWindow Redesigned release candidate
+# WorkWindow Redesigned — released October 25, 2026
 
 Mac browser first. iPhone supports quick review; native desktop notes, offline operation, installation, and background push notifications are outside this release.
 
@@ -22,7 +22,7 @@ Mac browser first. iPhone supports quick review; native desktop notes, offline o
 
 ## Database preparation
 
-`docs/redesigned-workspaces.sql` was applied to Supabase project `your-project-ref` as `redesigned_workspaces`.
+The additive `docs/redesigned-workspaces.sql` schema was applied to the configured Supabase project. Deployment-specific identifiers are kept outside this public repository.
 
 Owner insert/update, denied stale revision, denied non-owner read/insert, and denied anonymous access were verified in a rolled-back transaction. The new table remained empty afterward. The legacy workspace digest was identical before and after.
 
@@ -32,15 +32,14 @@ Existing security advisories, unchanged by this release:
 - `is_current_user_allowed` is an intentionally callable security-definer boolean helper used by ownership policies; revoking it would break access: https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable
 - Password breach protection is disabled; the application uses magic-link login: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
 
-## Remaining release gates
+## Release verification
 
-1. Push the candidate branch and confirm hosted CI checks.
-2. Stage with production environment variables and `--skip-domain` in Vercel project `prj_REDACTED`, team `team_REDACTED`.
-3. Verify the staged build, magic-link redirect, authenticated loading, save/reload, and cross-session refresh. An owner's sign-in is needed for this final check; do not export or commit authentication state.
-4. Promote only the tested production build after those gates pass. Keep the main-branch PR workflow.
+The release was merged in [PR #14](https://github.com/acanave/WorkWindow/pull/14) and the tested build was promoted to the live site. Hosted checks verified owner magic-link login, task creation, notes/blockers/dates/effort saving, calendar display, completion, reload, and second-tab refresh. Disposable verification data was removed, and the legacy data checksum was unchanged. Production capture-draft saving and reload also passed.
+
+The short post-release Vercel runtime-error query returned no records. This does not provide browser-error monitoring or continuous alerting.
 
 ## Rollback
 
-Current production rollback target: `dpl_REDACTED` (`workwindow-deployment.example.invalid`), commit `d9681a4228ea894157ac8d2494c09e75af900619`.
+Keep the previous verified deployment ID in private operational notes. Vercel deployment rollback does not roll back database contents.
 
 A deployment rollback restores the old interface and reads the untouched legacy workspace. It does **not** include work newly entered in the redesigned table. Export redesigned work before reverting and reconcile afterward. Do not drop the new table or run any preview reset against cloud data.
