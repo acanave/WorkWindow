@@ -84,6 +84,7 @@ describe('CardModal', () => {
       />,
     )
 
+    await user.click(screen.getByRole('button', { name: /schedule work time/i }))
     await user.type(screen.getByLabelText('Start'), '2026-05-11')
     await user.type(screen.getByLabelText('End'), '2026-05-14')
     await user.clear(screen.getByLabelText('Pts/day'))
@@ -119,7 +120,34 @@ describe('CardModal', () => {
       />,
     )
 
-    expect(screen.getByLabelText('Anchor due date')).toHaveValue('2026-05-11')
+    expect(screen.getByLabelText('Deadline')).toHaveValue('2026-05-11')
+  })
+
+  it('keeps scheduling and dependencies optional until needed', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <CardModal
+        mode="create"
+        card={null}
+        allCards={[makeCard()]}
+        onClose={vi.fn()}
+        onCreate={vi.fn()}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        onLogProgress={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByLabelText('Start')).not.toBeInTheDocument()
+    expect(screen.queryByText('Task A')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /schedule work time/i }))
+    await user.click(screen.getByRole('button', { name: /dependencies/i }))
+
+    expect(screen.getByLabelText('Start')).toBeInTheDocument()
+    expect(screen.getByText('Task A')).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: /estimated effort/i })).toHaveValue(4)
   })
 
   it('requires confirmation before deleting a work item', async () => {
