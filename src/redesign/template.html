@@ -1,0 +1,246 @@
+<div id="ww-day-concept">
+  <aside class="wd-nav">
+    <div class="wd-brand">
+      <img
+        class="ww-vector-mark"
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMzAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIyMCAyNCAzMzAgMTgwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJsdWUiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iIzIxQjhGRiIgLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwODYxRjkiIC8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImN5YW4iIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iIzBGRjJGMiIgLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMEFGQ0IiIC8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9InB1cnBsZSIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjRDE4QkZGIiAvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzczMzhFQyIgLz48L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii00MCUiIHk9Ii01MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjIwMCUiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjEwIiAvPjwvZmlsdGVyPjwvZGVmcz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyOCAzNCkgc2tld1goMjIpIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iNzIiIGhlaWdodD0iMTYwIiByeD0iMzIiIGZpbGw9InVybCgjYmx1ZSkiIC8+PHJlY3QgeD0iODkiIHk9IjAiIHdpZHRoPSI3MiIgaGVpZ2h0PSIxNjAiIHJ4PSIzMiIgZmlsbD0idXJsKCNjeWFuKSIgLz48cmVjdCB4PSIxNzgiIHk9IjAiIHdpZHRoPSI3MiIgaGVpZ2h0PSIxNjAiIHJ4PSIzMiIgZmlsbD0idXJsKCNwdXJwbGUpIiAvPjwvZz48L3N2Zz4="
+        alt=""
+        aria-hidden="true"
+        draggable="false"
+      /><span class="ww-logo-wordmark">WorkWindow</span>
+    </div>
+    <div class="wd-workspace">MY WORKSPACE</div>
+    <button class="wd-navitem wd-active cursor-interaction" type="button" data-page="dashboard" aria-pressed="true">
+      <i data-lucide="layout-dashboard"></i> Dashboard
+    </button>
+    <button class="wd-navitem cursor-interaction" type="button" data-page="calendar" aria-pressed="false">
+      <i data-lucide="calendar-days"></i> Calendar
+    </button>
+    <button class="wd-navitem cursor-interaction" type="button" data-page="boards" aria-pressed="false">
+      <i data-lucide="columns-3"></i> Boards
+    </button>
+    <button class="wd-navitem cursor-interaction" type="button" data-page="projects" aria-pressed="false">
+      <i data-lucide="folder"></i> Projects
+    </button>
+    <button type="button" class="ww-globalcapture cursor-interaction" aria-label="Quick capture (N)">
+      <i data-lucide="plus" aria-hidden="true"></i> Quick capture
+    </button>
+    <div class="wd-profile">
+      <span>W</span>
+      <div>Personal workspace<small>Your workspace</small></div>
+    </div>
+  </aside>
+  <main class="wd-main">
+    <div class="wd-dashboardview">
+      <header class="wd-header">
+        <div class="wd-eyebrow"></div>
+        <h1>Today</h1>
+        <p>Capture a thought. Choose your next step.</p>
+      </header>
+      <div class="wd-columns">
+        <section class="wd-backlog" aria-label="Sticky inbox">
+          <div class="wd-sectiontitle">
+            <h2>Sticky inbox</h2>
+            <span class="wd-note-count">0</span>
+          </div>
+          <p class="wd-subtitle">Capture now. Details can wait.</p>
+          <form class="wd-capture">
+            <label
+              ><span class="wd-sr">Quick capture</span
+              ><textarea rows="3" placeholder="Drop a thought, task, or reminder…" required maxlength="300"></textarea>
+            </label>
+            <div class="wd-capturetypes" role="group" aria-label="Create as">
+              <button class="cursor-interaction" type="button" data-capture-type="Sticky" aria-pressed="true">
+                Sticky
+              </button>
+              <button class="cursor-interaction" type="button" data-capture-type="Task" aria-pressed="false">
+                Task
+              </button>
+              <button class="cursor-interaction" type="button" data-capture-type="Reminder" aria-pressed="false">
+                Reminder
+              </button>
+              <button class="cursor-interaction" type="button" data-capture-type="Project" aria-pressed="false">
+                Project
+              </button>
+            </div>
+            <p class="wd-capturehint">Keep it in your sticky inbox. Develop it later.</p>
+            <div class="wd-taskoptions" hidden>
+              <label class="wd-todaycheck"><input type="checkbox" /> Add to today, anytime</label>
+              <label class="wd-projectpick"
+                >Project
+                <select aria-label="Assign task to project">
+                  <option value="">No project</option>
+                </select></label
+              >
+            </div>
+            <label class="wd-reminderoption" hidden
+              >Remind me <span>Optional — set it later</span
+              ><input type="datetime-local" aria-label="Reminder date and time"
+            /></label>
+            <div class="wd-capturebottom">
+              <button class="wd-capturebutton cursor-interaction" type="button">Save sticky</button>
+            </div>
+          </form>
+          <div class="wd-notes"></div>
+          <button class="wd-backlogtoggle wd-link cursor-interaction" type="button" aria-expanded="false">
+            View sticky inbox
+          </button>
+          <p class="wd-feedback" role="status" aria-live="polite"></p>
+        </section>
+        <section class="wd-day" aria-label="Today's day view">
+          <div class="wd-sectiontitle">
+            <h2>Today</h2>
+            <span class="wd-date"></span>
+          </div>
+          <p class="wd-subtitle wd-todaysummary">0h planned · 0 anytime</p>
+          <section class="wd-anytime" aria-label="Today, anytime">
+            <div class="wd-anytimehead">
+              <h3>Today, anytime</h3>
+              <span>No time block needed</span>
+            </div>
+            <div class="wd-todos"></div>
+          </section>
+          <details class="wd-done">
+            <summary class="cursor-interaction">Done today · <span class="wd-donecount">0</span></summary>
+            <div class="wd-donelist"></div>
+          </details>
+          <div class="wd-dayheads">
+            <span><i data-lucide="clock-3"></i> Today’s schedule</span><span>All day</span>
+          </div>
+          <div class="wd-reminders"></div>
+          <div class="wd-calendarhost"></div>
+          <div class="wd-selection" aria-live="polite">
+            <strong></strong><span></span>
+            <p></p>
+            <small></small><button class="wd-completeblock wd-link cursor-interaction" type="button">Mark done</button>
+          </div>
+        </section>
+        <section class="wd-projects" aria-label="Project updates">
+          <div class="wd-sectiontitle">
+            <h2>Project pulse</h2>
+            <span class="wd-projectcount">0 projects</span>
+          </div>
+          <p class="wd-subtitle">What moved. What needs you.</p>
+          <div class="wd-projectlist"></div>
+        </section>
+      </div>
+      <footer class="wd-footer">
+        <span>Capture → Shape → Make time</span
+        ><span>Dashboard · Your day &nbsp; / &nbsp; Calendar · Your wider WorkWindows</span>
+      </footer>
+    </div>
+    <section class="wc-view" aria-label="WorkWindow calendar" hidden>
+      <header class="wd-header wc-header">
+        <div class="wd-eyebrow">CALENDAR</div>
+        <h1>Calendar</h1>
+        <p>Your WorkWindows, deadlines, and booked time.</p>
+      </header>
+      <div class="wc-toolbar">
+        <div class="wc-period">
+          <button class="wc-prev wc-btn cursor-interaction" type="button" aria-label="Previous period">
+            <i data-lucide="chevron-left"></i></button
+          ><button class="wc-next wc-btn cursor-interaction" type="button" aria-label="Next period">
+            <i data-lucide="chevron-right"></i>
+          </button>
+          <h2 class="wc-monthtitle"></h2>
+          <button class="wc-today wc-btn cursor-interaction" type="button">Today</button>
+        </div>
+        <div class="wc-views" role="group" aria-label="Calendar view">
+          <button class="cursor-interaction" type="button" data-cal-mode="month" aria-pressed="true">Month</button
+          ><button class="cursor-interaction" type="button" data-cal-mode="week" aria-pressed="false">Week</button>
+        </div>
+      </div>
+      <div class="wc-legend">
+        <span><b class="wc-windowkey"></b> WorkWindow</span><span>◆ Deadline</span><span>● Planned work</span
+        ><span><i data-lucide="bell"></i> Reminder</span><span class="wc-shared">Shared with your dashboard</span>
+      </div>
+      <div class="wc-layout">
+        <div class="wc-calendararea">
+          <div class="wc-month" aria-label="Monthly calendar">
+            <div class="wc-weekdays">
+              <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span
+              ><span>Sat</span>
+            </div>
+            <div class="wc-weeks"></div>
+          </div>
+          <div class="wc-unscheduled">
+            <div><strong>Ready to plan</strong><span class="wc-readycount"></span></div>
+            <div class="wc-readyitems"></div>
+          </div>
+        </div>
+        <aside class="wc-inspector" aria-label="Selected day and work details">
+          <div class="wc-daydetail"></div>
+          <div class="wc-itemdetail" hidden></div>
+          <div class="wc-planner">
+            <h3>Make time for it</h3>
+            <p class="wc-plannerhint">Schedule a task or project time block.</p>
+            <form class="wc-planform">
+              <label
+                >Plan a<select class="wc-plankind">
+                  <option value="block">Time block</option>
+                  <option value="window">WorkWindow</option>
+                </select></label
+              ><label>Work item<select class="wc-planitem" aria-label="Work item to schedule"></select></label
+              ><label><span class="wc-datelabel">Date</span><input class="wc-plandate" type="date" required /></label>
+              <div class="wc-planpair">
+                <label>Start<input class="wc-planstart" type="time" value="14:30" required /></label
+                ><label
+                  >Duration<select class="wc-duration">
+                    <option value="30">30 min</option>
+                    <option value="60">1 hour</option>
+                    <option value="90">1h 30m</option>
+                    <option value="120">2 hours</option>
+                  </select></label
+                >
+              </div>
+              <div class="wc-windowfields" hidden>
+                <label>Deadline<input class="wc-windowend" type="date" /></label
+                ><label
+                  >Estimated effort<select class="wc-windoweffort">
+                    <option value="60">1 hour</option>
+                    <option value="120">2 hours</option>
+                    <option value="240">4 hours</option>
+                    <option value="480">8 hours</option>
+                  </select></label
+                >
+              </div>
+              <button class="wc-save wc-btn wc-primary cursor-interaction" type="button">Save time block</button>
+              <p class="wc-error" role="alert"></p>
+            </form>
+          </div>
+          <p class="wc-status" role="status" aria-live="polite"></p>
+        </aside>
+      </div>
+    </section>
+    <section class="wb-view" aria-label="Work board" hidden>
+      <header class="wd-header">
+        <div class="wd-eyebrow">BOARDS</div>
+        <h1>Boards</h1>
+        <p>Follow each project from idea to done.</p>
+      </header>
+      <div class="wb-toolbar">
+        <label
+          >Project
+          <select class="wb-filter" aria-label="Filter board by project"></select></label
+        ><span class="wb-summary"></span
+        ><button class="wb-capture wc-btn cursor-interaction" type="button">Quick capture →</button>
+      </div>
+      <div class="wb-columns"></div>
+      <p class="wb-help">
+        Drag cards between columns, or use their status menu. Scheduled time stays separate from progress.
+      </p>
+    </section>
+    <section class="wp-view" aria-label="Projects" hidden>
+      <header class="wd-header">
+        <div class="wd-eyebrow">PROJECTS</div>
+        <h1>Projects</h1>
+        <p>The outcome, the timetable, and the next step.</p>
+      </header>
+      <div class="wp-layout">
+        <div class="wp-list"></div>
+        <div class="wp-detail"></div>
+      </div>
+    </section>
+    <p class="wb-feedback" role="status" aria-live="polite"></p>
+  </main>
+</div>

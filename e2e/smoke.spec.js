@@ -1,73 +1,49 @@
 import { expect, test } from '@playwright/test'
-import { SCHEMA_VERSION, STORAGE_KEY } from '../src/state/schema.js'
-
-const SELECTED_DATE = '2026-08-07'
-const CARD_TITLE = 'E2E smoke test card'
-const UPDATED_CARD_TITLE = 'E2E smoke test card updated'
-
-test('local workflow persists a planned card across reloads', async ({ page }) => {
-  await test.step('start with an isolated local workspace', async () => {
-    await page.goto('/')
-    await page.evaluate(
-      ({ schemaVersion, selectedDate, storageKey }) => {
-        window.localStorage.clear()
-        window.localStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            version: schemaVersion,
-            ui: { selectedDate },
-            cards: [],
-          }),
-        )
-      },
-      { schemaVersion: SCHEMA_VERSION, selectedDate: SELECTED_DATE, storageKey: STORAGE_KEY },
-    )
-    await page.reload()
-
-    await expect(page.getByRole('button', { name: 'Open Local Mode' })).toBeVisible()
-    await page.getByRole('button', { name: 'Open Local Mode' }).click()
-    await expect(page.getByRole('heading', { name: /see not just what is scheduled/i })).toBeVisible()
-  })
-
-  await test.step('create and edit a card', async () => {
-    await page.getByRole('button', { name: 'New Work Item' }).click()
-    await expect(page.getByRole('heading', { name: 'Create Work Item' })).toBeVisible()
-    await page.getByLabel('Title').fill(CARD_TITLE)
-    await page.getByLabel('Description').fill('Created by the Playwright smoke suite.')
-    await page.getByLabel('Required window points').fill('3')
-    await page.getByRole('button', { name: 'Create', exact: true }).click()
-
-    await page.getByRole('button', { name: 'Cards' }).click()
-    await expect(page.getByRole('heading', { name: /plan with clarity/i })).toBeVisible()
-    await page.getByRole('button', { name: `Expand ${CARD_TITLE}` }).click()
-    await page.getByRole('button', { name: 'Edit', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Edit Work Item' })).toBeVisible()
-    await page.getByLabel('Title').fill(UPDATED_CARD_TITLE)
-    await page.getByLabel('Description').fill('Edited, moved, planned, and persisted by Playwright.')
-    await page.getByRole('button', { name: 'Save', exact: true }).click()
-    await expect(page.getByRole('button', { name: `Collapse ${UPDATED_CARD_TITLE}` })).toBeVisible()
-  })
-
-  await test.step('move and schedule the card', async () => {
-    await page.getByLabel(`Move ${UPDATED_CARD_TITLE}`).selectOption('In Progress')
-    const inProgressColumn = page
-      .getByRole('heading', { name: 'In Progress', exact: true })
-      .locator('xpath=ancestor::section')
-    await expect(inProgressColumn.getByText(UPDATED_CARD_TITLE)).toBeVisible()
-    await page.getByRole('button', { name: `Plan for ${SELECTED_DATE}` }).click()
-
-    await page.getByRole('button', { name: 'Calendar' }).click()
-    await expect(page.getByTitle(new RegExp(`Work window: ${UPDATED_CARD_TITLE}`)).first()).toBeVisible()
-  })
-
-  await test.step('reload and verify local persistence', async () => {
-    await page.reload()
-    await expect(page.getByRole('heading', { name: /see not just what is scheduled/i })).toBeVisible()
-    await expect(page.getByTitle(new RegExp(`Work window: ${UPDATED_CARD_TITLE}`)).first()).toBeVisible()
-
-    await page.getByRole('button', { name: 'Cards' }).click()
-    await page.getByRole('button', { name: `Expand ${UPDATED_CARD_TITLE}` }).click()
-    await expect(page.getByLabel(`Move ${UPDATED_CARD_TITLE}`)).toHaveValue('In Progress')
-    await expect(page.getByText('Edited, moved, planned, and persisted by Playwright.')).toBeVisible()
-  })
+test('capture, choose today, complete and reload', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Task', exact: true }).click()
+  await page.getByRole('textbox', { name: 'Quick capture', exact: true }).fill('Release workflow test')
+  await page.getByRole('button', { name: 'Create task', exact: true }).click()
+  await page.getByRole('button', { name: 'Add to today', exact: true }).click()
+  await expect(page.getByRole('checkbox', { name: 'Complete Release workflow test' })).toBeVisible()
+  await page.reload()
+  // Completion removes the checkbox; assert the resulting state instead of checked state.
+  await page.getByRole('checkbox', { name: 'Complete Release workflow test' }).click()
+  await expect(page.getByText('1 completed · 0 left today', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Boards', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Release workflow test', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Release workflow test', exact: true }).click()
+  await expect(page.getByRole('dialog', { name: 'Task details' })).toBeVisible()
+})
+test('project, task WorkWindow, blockers and notes persist across views', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Project', exact: true }).click()
+  await page.getByRole('textbox', { name: 'Quick capture', exact: true }).fill('Release project')
+  await page.locator('.wd-capturebutton').click()
+  await page.getByRole('button', { name: 'Projects', exact: true }).click()
+  await page.getByLabel('New task for Release project').fill('Plan launch')
+  await page.getByRole('button', { name: 'Add task', exact: true }).click()
+  await page.getByRole('button', { name: 'Open task: Plan launch' }).click()
+  await page.getByLabel('Notes & information').fill('Keep these editing notes')
+  const today = new Date().toLocaleDateString('en-CA')
+  await page.getByLabel('Start date', { exact: true }).fill(today)
+  await page.getByRole('dialog', { name: 'Task details' }).getByLabel('Deadline', { exact: true }).fill(today)
+  await page.getByLabel('Estimated effort (hours)', { exact: true }).fill('1.5')
+  await page.getByRole('checkbox', { name: 'Mark as blocked' }).check()
+  await page.getByLabel('Blocker reason').fill('Waiting for final review')
+  await page.getByRole('button', { name: 'Save changes', exact: true }).click()
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
+  await page.reload()
+  await page.getByRole('button', { name: 'Projects', exact: true }).click()
+  await page.getByRole('button', { name: 'Open task: Plan launch' }).click()
+  await expect(page.getByLabel('Notes & information')).toHaveValue('Keep these editing notes')
+  await expect(page.getByLabel('Start date', { exact: true })).toHaveValue(today)
+  await expect(page.getByRole('dialog', { name: 'Task details' }).getByLabel('Deadline', { exact: true })).toHaveValue(
+    today,
+  )
+  await expect(page.getByLabel('Estimated effort (hours)', { exact: true })).toHaveValue('1.5')
+  await expect(page.getByLabel('Blocker reason')).toHaveValue('Waiting for final review')
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
+  await page.getByRole('button', { name: 'Calendar', exact: true }).click()
+  await expect(page.locator('.wc-view')).toContainText('Plan launch')
 })
