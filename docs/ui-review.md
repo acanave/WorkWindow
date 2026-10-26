@@ -1,3 +1,7 @@
+# Historical UI references
+
+This document records the pre-redesign interface. It is retained for design history, not as the current product specification. See the root README for the four current views and supported features.
+
 # UI Review Inbox
 
 Use this file to collect screenshots, image links, or notes for future WorkWindow UI changes.

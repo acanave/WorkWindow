@@ -1,78 +1,76 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { expect, test } from '@playwright/test'
-import demoState from '../src/test/fixtures/readme-demo-state.json' with { type: 'json' }
-import { STORAGE_KEY } from '../src/state/schema.js'
+import { emptyWorkspace } from '../src/redesign/model.js'
 
-const LAUNCH_MODE_KEY = 'workwindow:launch-mode'
-const THEME_KEY = 'workwindow:theme'
 const screenshotsDir = path.resolve('docs/screenshots')
+// Fictional documentation content only. Never load production accounts for screenshots.
+const state = emptyWorkspace()
+state.appearance = 'light'
+state.projects = [{ id: 'demo-project', title: 'Studio refresh' }]
+state.notes = [{ id: 'demo-note', text: 'Try a softer desk light', when: 'Captured' }]
+state.todos = [
+  { id: 'demo-today', title: 'Choose the desk layout', project: 'Studio refresh', plannedFor: '2026-10-25' },
+]
+state.events = [
+  {
+    id: 'demo-block',
+    title: 'Review studio ideas',
+    project: 'Studio refresh',
+    date: '2026-10-25',
+    start: '09:00',
+    end: '10:00',
+    detail: 'Compare layouts and choose a direction.',
+  },
+]
+state.workItems = [
+  { id: 'demo-backlog', title: 'Explore wall colors', project: 'Studio refresh', status: 'Backlog' },
+  { id: 'demo-active', title: 'Measure the room', project: 'Studio refresh', status: 'In progress' },
+]
+state.workWindows = [
+  {
+    id: 'demo-window',
+    itemId: 'demo-project',
+    title: 'Studio refresh',
+    type: 'project',
+    start: '2026-10-25',
+    end: '2026-10-30',
+    due: '2026-10-30',
+    effort: 240,
+    parts: [['Focus', 240]],
+  },
+]
 
-function ensureScreenshotsDir() {
+test.beforeEach(async ({ page }) => {
   fs.mkdirSync(screenshotsDir, { recursive: true })
-}
+  await page.clock.setFixedTime(new Date('2026-10-25T12:00:00'))
+  await page.addInitScript((workspace) => {
+    localStorage.setItem('workwindow:redesigned:local', JSON.stringify({ state: workspace, revision: 0, dirty: false }))
+  }, state)
+  await page.goto('/')
+  await expect(page.getByText('Saved on this device', { exact: true })).toBeVisible()
+})
 
-async function waitForFonts(page) {
-  await page.evaluate(async () => {
-    if (document.fonts?.ready) {
-      await document.fonts.ready
-    }
+for (const [view, filename] of [
+  ['Dashboard', 'dashboard-overview.png'],
+  ['Boards', 'board-overview.png'],
+  ['Calendar', 'calendar-overview.png'],
+  ['Projects', 'projects-overview.png'],
+]) {
+  test(`capture redesigned ${view}`, async ({ page }) => {
+    await page.getByRole('button', { name: view, exact: true }).click()
+    await expect(
+      page.getByRole('heading', { name: view === 'Dashboard' ? 'Today' : view, exact: true }).first(),
+    ).toBeVisible()
+    await page.evaluate(() => document.fonts.ready)
+    await page.evaluate(() => window.scrollTo(0, 0))
+    if (view === 'Dashboard')
+      await page
+        .locator('workwindow-day')
+        .locator('.scroll')
+        .evaluate((node) => {
+          node.scrollTop = 480
+        })
+    await page.screenshot({ path: path.join(screenshotsDir, filename) })
   })
 }
-
-async function seedLocalMode(page) {
-  await page.addInitScript(
-    ({ storageKey, launchModeKey, themeKey, state }) => {
-      window.localStorage.clear()
-      window.localStorage.setItem(storageKey, JSON.stringify(state))
-      window.localStorage.setItem(launchModeKey, 'local')
-      window.localStorage.setItem(themeKey, 'light')
-    },
-    {
-      storageKey: STORAGE_KEY,
-      launchModeKey: LAUNCH_MODE_KEY,
-      themeKey: THEME_KEY,
-      state: demoState,
-    },
-  )
-}
-
-async function resetToModeChooser(page) {
-  await page.addInitScript(
-    ({ themeKey }) => {
-      window.localStorage.clear()
-      window.localStorage.setItem(themeKey, 'light')
-    },
-    { themeKey: THEME_KEY },
-  )
-}
-
-test.beforeAll(() => {
-  ensureScreenshotsDir()
-})
-
-test('capture launch mode screen', async ({ page }) => {
-  await resetToModeChooser(page)
-  await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Open Local Mode' })).toBeVisible()
-  await waitForFonts(page)
-  await page.screenshot({ path: path.join(screenshotsDir, 'mode-chooser.png') })
-})
-
-test('capture calendar overview', async ({ page }) => {
-  await seedLocalMode(page)
-  await page.goto('/')
-  await expect(page.getByRole('heading', { name: /see not just what is scheduled/i })).toBeVisible()
-  await waitForFonts(page)
-  await page.screenshot({ path: path.join(screenshotsDir, 'calendar-overview.png') })
-})
-
-test('capture board overview', async ({ page }) => {
-  await seedLocalMode(page)
-  await page.goto('/')
-  await page.getByRole('button', { name: 'Cards' }).click()
-  await expect(page.getByRole('heading', { name: /plan with clarity/i })).toBeVisible()
-  await page.getByRole('button', { name: /expand cloud sync landing copy/i }).click()
-  await waitForFonts(page)
-  await page.screenshot({ path: path.join(screenshotsDir, 'board-overview.png') })
-})

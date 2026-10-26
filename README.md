@@ -1,103 +1,76 @@
 # WorkWindow
 
-WorkWindow started as a personal frustration: my to-do list knew what existed, my calendar knew when things were happening, and my Kanban board knew what was moving, but none of them helped me plan real execution in one flow.
+**Capture a thought → choose today’s work → do it → feel finished.**
 
-I built this to feel human and practical: one workspace where commitments, workload, and progress are visible together. The goal is simple, make weekly planning and day-to-day execution easier without juggling three disconnected tools.
+WorkWindow brings quick capture, daily planning, Kanban boards, and projects into one browser workspace. A thought can stay a sticky note or become a task, reminder, or project immediately.
 
-Under the hood, WorkWindow is a local-first planning app that unifies calendar scheduling, Kanban execution, and workload visibility, with an optional path to authenticated cloud sync.
+[Open WorkWindow](https://workwindow.vercel.app) · The hosted workspace requires an approved account. Run locally to explore an empty workspace without signing in.
 
-![WorkWindow calendar overview](docs/screenshots/calendar-overview.png)
-![WorkWindow board overview](docs/screenshots/board-overview.png)
+![WorkWindow redesigned dashboard with fictional example data](docs/screenshots/dashboard-overview.png)
 
-## Why This Project Matters
+## One workspace, four views
 
-- Product-thinking implementation of a real planning workflow, not a demo CRUD app.
-- Local-first UX with optional authenticated cloud sync.
-- Dependency-aware execution model with risk visibility and progress tracking.
-- Test-backed frontend architecture suitable for production iteration.
+| View      | Purpose                                                                                                                     |
+| --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard | Capture thoughts, choose today’s tasks, see booked time, and complete or defer work.                                        |
+| Calendar  | See month/week plans, drag across dates to create a WorkWindow, and book specific time blocks.                              |
+| Boards    | Follow Backlog → Ready → In progress → Done with stacked project piles, shared project colors, and expandable task details. |
+| Projects  | Review the timetable, next action, progress, blockers, tasks, and saved project notes.                                      |
 
-## Core Capabilities
+A **WorkWindow** is a date range and estimated effort in hours. A **time block** reserves a specific start time and duration. Task details let you edit notes, blockers, dependencies, dates, and effort without leaving the board.
 
-- Kanban board with Backlog, In Progress, Blocked, and Done lanes.
-- Month calendar with due-date anchors and supporting work windows.
-- Dependency warnings, chain visibility, and cycle badges.
-- Due-date shortfall and overdue risk indicators.
-- Performance panel with burnup, plan coverage, and weekly velocity.
-- JSON import/export and local/cloud mode support.
-- Touch-friendly fallback actions for planning and status changes.
+![WorkWindow redesigned boards with fictional example data](docs/screenshots/board-overview.png)
 
-## Technical Snapshot
+Screenshots use fictional fixtures isolated from production. New workspaces contain no sample tasks or projects.
 
-- React + Vite frontend, local-first state persistence.
-- Optional Supabase Auth + Postgres sync path.
-- Normalized reducer-driven state with migration scaffolding.
-- Tests across store logic, calendar interactions, and Kanban flows.
-- CI-gated quality checks with automated secret scanning.
+## Run locally
 
-## Quick Start (Local-First)
-
-Use this path to run the app without any external services.
+Requires Node.js 24.x and npm.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-If no cloud env vars are present, the app opens with a mode chooser:
+Without Supabase environment variables, the dashboard opens directly and saves to this browser. There is no mode chooser. Local data does not automatically sync or migrate into a cloud account.
 
-- `Local First` launches the full planner using browser storage only
-- `Cloud Sync` shows the setup path for Supabase-backed auth and sync
+For an authenticated deployment, follow [Cloud setup](docs/cloud-setup.md). The hosted app uses Supabase email magic links and stores owner-scoped workspaces in Postgres.
 
-## Optional Cloud Sync
+## Saving and privacy
 
-For authenticated multi-device sync and hosted deployment, follow the setup guide:
+- Local evaluation uses browser storage. Configured cloud deployments also keep a device cache, including unsynced edits.
+- Cloud saves are serialized and checked against a revision number. A conflicting edit pauses saving instead of overwriting newer work; export the local draft before loading the saved workspace.
+- Other sessions refresh from the cloud periodically and on window focus when no edits are pending.
+- Export backup downloads workspace JSON. Treat exports as private; there is currently no redesigned import/restore interface.
+- Upgraded legacy cards retain their original records. Legacy effort points are preserved as context, not converted to hours.
 
-- [Cloud Sync Setup](./docs/cloud-setup.md)
+See [Privacy](PRIVACY.md) and [Security](SECURITY.md). Never put passwords, tokens, private exports, or server-side keys in this public repository. Vite environment variables are browser-visible; use only the Supabase URL and publishable key.
 
-## Repository Boundaries
+## Architecture
 
-WorkWindow is maintained as a public product repository. Keep this repository focused on product code and public-safe defaults.
+React/Vite provides the application shell and authentication. `src/redesign/Workspace.jsx` mounts the approved interface, `controller.js` handles view interactions, `model.js` validates and migrates workspaces, and `cloud.js` handles revision-checked persistence. The UI shares one workspace across all four tabs.
 
-- Include: UI, app logic, tests, docs, schema, migration scripts, sample data.
-- Exclude: personal secrets, bot tokens, private deployment credentials, personal automation scripts, exported personal task data.
+Older components in `src/components` and the reducer under `src/state` remain for legacy coverage and reference; they are not the redesigned UI entry point. This is an incremental migration, not a complete rewrite of every source module.
 
-If you run personal automations (for example OpenClaw + Telegram), keep that in a separate private repository and integrate through API/webhook contracts rather than embedding private credentials in this repo.
-
-### Data and secret handling
-
-- Store live app data in runtime storage (browser storage, Supabase, or your backend database), not in git.
-- Keep only placeholders in `.env.example`.
-- Keep `.env.local` untracked.
-- Never expose server-only keys (such as Supabase service-role keys) in Vite environment variables.
-
-Secret scanning runs in CI on every push and pull request to `main`.
-
-## Trust and Policies
-
-- Security policy: [SECURITY.md](./SECURITY.md)
-- Privacy notice: [PRIVACY.md](./PRIVACY.md)
-
-## Quality Checks
+## Checks and contribution
 
 ```bash
-npm run test
-npm run build
 npm run lint
+npm run format:check
+npm test
+npm run build
+npm run screenshots:install
+npm run test:e2e
 ```
 
-Preview a production build:
+To regenerate the fictional README screenshots: `npm run screenshots:capture`.
 
-```bash
-npm run preview
-```
+CI runs formatting, lint, unit tests, build, browser/accessibility checks, and a full-history Gitleaks scan. See [Contributing](CONTRIBUTING.md) and [release notes](docs/REDESIGNED-RELEASE.md).
 
-## Known Limitations
+## Current scope
 
-- tests cover core flows, but not every interaction edge case
-- the calendar is month-only today
-- mobile uses touch-friendly action fallbacks instead of advanced drag-and-drop
-- there is no automatic scheduling suggestion engine yet
-
-## Development Notes
-
-Developer workflow and repository checks live in [CONTRIBUTING.md](./CONTRIBUTING.md).
+- Desktop browser use is primary; narrow layouts support basic phone review.
+- Sticky notes and reminders live inside the app. Native floating notes and background push notifications are not implemented.
+- No guaranteed offline capture/sync, installable-app support, automatic scheduling, or collaborative real-time editing.
+- Light and dark appearances are tested. Automated accessibility checks complement, rather than replace, manual testing.
+- Legacy insights, point-based planning, and import controls are not part of the redesigned interface.

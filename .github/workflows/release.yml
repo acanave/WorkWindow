@@ -54,26 +54,35 @@ jobs:
       - name: Package release artifact
         shell: bash
         run: |
-          TAR_NAME="workwindow-dist-${GITHUB_SHA}.tar.gz"
+          RELEASE_COMMIT="$(git rev-parse HEAD)"
+          echo "RELEASE_COMMIT=$RELEASE_COMMIT" >> "$GITHUB_ENV"
+          TAR_NAME="workwindow-dist-${RELEASE_COMMIT}.tar.gz"
           tar -czf "$TAR_NAME" dist
           sha256sum "$TAR_NAME" > "${TAR_NAME}.sha256"
           echo "TAR_NAME=$TAR_NAME" >> "$GITHUB_ENV"
 
       - name: Prepare tag name
         shell: bash
+        env:
+          REQUESTED_TAG: ${{ inputs.tag }}
         run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            echo "RELEASE_TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            RELEASE_TAG="$GITHUB_REF_NAME"
           else
-            echo "RELEASE_TAG=${{ inputs.tag }}" >> "$GITHUB_ENV"
+            RELEASE_TAG="$REQUESTED_TAG"
           fi
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Use a semantic version tag such as v0.2.0 or v0.2.0-rc.1." >&2
+            exit 1
+          fi
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
       - name: Create tag for manual release
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
-          git tag "${{ env.RELEASE_TAG }}" "${GITHUB_SHA}"
-          git push origin "${{ env.RELEASE_TAG }}"
+          git tag "$RELEASE_TAG" "$RELEASE_COMMIT"
+          git push origin "refs/tags/$RELEASE_TAG"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
