@@ -10,3 +10,13 @@ workwindow-export.json
 .vercel
 playwright-report
 test-results
+
+# Private exports, credentials, and browser authentication artifacts
+.env.*
+!.env.example
+workwindow-backup*.json
+workwindow-export*.json
+playwright/.auth/
+*storage-state*.json
+*.pem
+*.key

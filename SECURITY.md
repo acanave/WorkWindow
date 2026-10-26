@@ -31,7 +31,7 @@ You can report through GitHub Security Advisories (preferred) or a private maint
 - Never commit credentials, tokens, personal exports, or private webhook URLs.
 - Use local env files and hosted secret managers for runtime configuration.
 - Use publishable frontend keys only in Vite environment variables.
-- Rotate any key immediately if exposed.
+- Revoke/rotate exposed secret credentials immediately. Supabase publishable keys are intentionally client-visible; their safety depends on correct database access policies.
 
 ## Repository Protections
 
@@ -39,8 +39,12 @@ This repo uses:
 
 - CI validation (lint, format, tests, build).
 - Automated secret scanning in GitHub Actions.
-- Main branch protection and PR-based merges.
+- PR-based merges. Repository owners must configure and verify branch protection in GitHub; this document does not enforce it.
 
 ## Disclosure
 
 After a fix is available, responsible disclosure notes may be published in release notes.
+
+## Public metadata and screenshots
+
+Use a GitHub no-reply commit email when personal email/device names should remain private. Review screenshots visually: token scanners do not reliably detect personal information in images. Generate documentation screenshots only from fictional local fixtures. Deployment identifiers are not credentials, but keep unnecessary operational metadata in private notes. Removing a value in a new commit does not remove it from Git history or existing clones.
