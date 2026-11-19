@@ -1,0 +1,55 @@
+name: Inactive task approval API
+on:
+  push:
+    branches: [codex/task-approval-api]
+    paths: ['candidates/task-approval/**', '.github/workflows/task-approval.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fake-tasks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17.6
+        env:
+          POSTGRES_PASSWORD: synthetic-ci-password
+          POSTGRES_DB: fake_workwindow
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd 'pg_isready -U postgres'
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+      PGPASSWORD: synthetic-ci-password
+      PGDATABASE: fake_workwindow
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Create synthetic database and candidate API
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -f candidates/task-approval/bootstrap-test.sql
+          psql -X -v ON_ERROR_STOP=1 -f docs/personal-access.sql
+          psql -X -v ON_ERROR_STOP=1 -f docs/redesigned-workspaces.sql
+          psql -X -v ON_ERROR_STOP=1 -f candidates/task-approval/schema.sql
+      - name: Start local PostgREST without production credentials
+        run: |
+          docker run -d --name fake-workwindow-api --network host \
+            -e PGRST_DB_URI=postgres://authenticator:synthetic-ci-password@127.0.0.1:5432/fake_workwindow \
+            -e PGRST_DB_SCHEMAS=public -e PGRST_DB_ANON_ROLE=anon \
+            -e PGRST_SERVER_HOST=127.0.0.1 -e PGRST_SERVER_PORT=3001 \
+            -e PGRST_JWT_SECRET=synthetic-jwt-secret-at-least-thirty-two-characters \
+            postgrest/postgrest:v13.0.7
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:3001/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Test HTTP approval boundary and atomic duplicate protection
+        run: python3 candidates/task-approval/test_api.py
+      - name: Remove disposable API
+        if: always()
+        run: docker rm -f fake-workwindow-api || true

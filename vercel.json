@@ -26,5 +26,10 @@
         }
       ]
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "codex/task-approval-api": false
+    }
+  }
 }
