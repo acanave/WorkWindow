@@ -8,12 +8,12 @@ One owner and one explicitly granted stored project. Create a Backlog `workItems
 
 `schema.sql` is an uninstalled SQL candidate, not an automatically applied migration. It adds one narrow PostgREST RPC, `POST /rest/v1/rpc/workwindow_task_approval`, to the existing Supabase architecture. No extra application server or broad service-role credential is needed. The private schema must never be exposed in PostgREST configuration.
 
-| Action | Identity | Body |
-| --- | --- | --- |
-| `prepare` | Scoped broker token | `requestKey`, `operation`, `projectId`, optional `taskId`, `patch` |
-| `read` | Scoped token or signed-in owner | `id` |
-| `approve` | Signed-in, currently eligible owner | `id`, `digest` |
-| `cancel` | Signed-in, currently eligible owner | `id`, `digest` |
+| Action    | Identity                            | Body                                                               |
+| --------- | ----------------------------------- | ------------------------------------------------------------------ |
+| `prepare` | Scoped broker token                 | `requestKey`, `operation`, `projectId`, optional `taskId`, `patch` |
+| `read`    | Scoped token or signed-in owner     | `id`                                                               |
+| `approve` | Signed-in, currently eligible owner | `id`, `digest`                                                     |
+| `cancel`  | Signed-in, currently eligible owner | `id`, `digest`                                                     |
 
 The RPC arguments are `{action, body, token}`. Use POST JSON; never put a token in a URL. The Supabase publishable key alone cannot approve. The broker gets no owner login/session, service-role key, direct table access, or approval capability. Its random token is hashed in a private grant row, scoped to one owner/project, expiring, revocable, and disabled by default. No grant row is inserted by the candidate. Provisioning and rotation are deferred to a separate activation review. Do not log request bodies or authorization headers.
 

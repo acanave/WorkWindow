@@ -9,6 +9,7 @@ import time
 import unittest
 import urllib.error
 import urllib.request
+import urllib.parse
 
 OWNER = '11111111-1111-4111-8111-111111111111'
 STRANGER = '22222222-2222-4222-8222-222222222222'
@@ -108,7 +109,9 @@ class ApprovalAPI(unittest.TestCase):
         self.assertEqual(api('read', {'id': preview['id']}, OWNER), (200, p))
         self.assertEqual(len(self.state()['workItems']), 1)
         # GET is never a write-capable RPC path.
-        self.deny(http('/rpc/workwindow_task_approval?action=approve&body=%7B%7D', subject=OWNER))
+        query = urllib.parse.urlencode({'action': 'approve', 'body': json.dumps(self.approval(p))})
+        self.deny(http('/rpc/workwindow_task_approval?' + query, subject=OWNER))
+        self.assertEqual(len(self.state()['workItems']), 1)
 
     def test_only_signed_in_owner_can_approve(self):
         p = self.prepare()
@@ -256,6 +259,36 @@ class ApprovalAPI(unittest.TestCase):
         # SQL privilege checks are independent of schema exposure.
         self.assertEqual(sql("select has_table_privilege('authenticated','ww_approval.proposals','UPDATE')"), 'f')
         self.assertEqual(sql("select has_table_privilege('anon','ww_approval.grant_config','SELECT')"), 'f')
+
+    def test_changed_grant_blocks_old_proposal(self):
+        p = self.prepare()
+        sql("update ww_approval.grant_config set project_id='other'")
+        self.deny(api('approve', self.approval(p), OWNER), 'grant_changed')
+        self.deny(api('read', {'id': p['proposal']['id']}, token=TOKEN), 'grant_changed')
+
+    def test_completed_task_rejected(self):
+        self.change("jsonb_set(state,'{workItems,0,status}','\"Done\"')")
+        self.deny(api('prepare', request(operation='update', taskId='task-1'), token=TOKEN), 'unsupported_task')
+
+    def test_browser_save_race_cannot_overwrite_approved_task(self):
+        p = self.prepare()
+        browser_state = self.state()
+        browser_state['unrelated']['keep'] = False
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            approval = pool.submit(api, 'approve', self.approval(p), OWNER)
+            browser = pool.submit(http, '/redesigned_workspaces?revision=eq.1',
+                                  {'state': browser_state, 'revision': 2}, OWNER, 'PATCH')
+            approve_result, browser_result = approval.result(), browser.result()
+        self.assertLess(browser_result[0], 300, browser_result)
+        final = self.state()
+        self.assertEqual(sql('select revision from public.redesigned_workspaces'), '2')
+        if approve_result[0] == 200:
+            self.assertEqual(len(final['workItems']), 2)
+            self.assertTrue(final['unrelated']['keep'])
+        else:
+            self.deny(approve_result, 'stale_proposal')
+            self.assertEqual(len(final['workItems']), 1)
+            self.assertFalse(final['unrelated']['keep'])
 
     def test_failed_receipt_rolls_back_task(self):
         p = self.prepare()
