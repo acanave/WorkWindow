@@ -40,3 +40,7 @@ The internal security-definer function is necessary for atomic access to private
 Now: discard this branch; nothing is installed. Later, if separately deployed: first disable the grant and stop broker admission, revoke RPC execute from `anon`/`authenticated`, preserve proposals/receipts and the workspace backup, then remove the UI/client. Do not delete tasks, roll back the workspace revision, or remove idempotency records to undo an integration deployment. Never run the synthetic bootstrap against a hosted database.
 
 References: [Supabase database functions and privileges](https://supabase.com/docs/guides/database/functions), [Supabase JWTs](https://supabase.com/docs/guides/auth/jwts), [Vercel branch deployment controls](https://vercel.com/docs/project-configuration/git-configuration).
+
+## Recorded isolated verification — November 19, 2026
+
+Source `4a3044a`: [API run 44638735730](https://github.com/acanave/WorkWindow/actions/runs/44638735730) passed all 22 HTTP/PostgreSQL tests. [Application run 44638735769](https://github.com/acanave/WorkWindow/actions/runs/44638735769) passed lint, formatting, unit tests, build and existing browser tests. Secret scan also passed. GitHub listed zero deployments for this candidate branch. No hosted Supabase, real user/task data, AWS, Telegram or GPT was used. The initial test-container quoting and README formatting failures were corrected before these successful runs. These checks establish isolated API behavior, not live authentication or browser approval acceptance.
