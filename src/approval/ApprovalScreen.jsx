@@ -162,8 +162,8 @@ export default function ApprovalScreen({ client, user, proposalId, onSignOut }) 
                   {['title', 'description', 'status'].map((field) => (
                     <tr key={field}>
                       <th scope="row">{field[0].toUpperCase() + field.slice(1)}</th>
-                      <td>{p.before ? p.before[field] || '(empty)' : '(new task)'}</td>
-                      <td>{p.after[field] || '(empty)'}</td>
+                      <td data-label="Before">{p.before ? p.before[field] || '(empty)' : '(new task)'}</td>
+                      <td data-label="After">{p.after[field] || '(empty)'}</td>
                     </tr>
                   ))}
                 </tbody>

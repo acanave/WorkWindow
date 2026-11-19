@@ -98,3 +98,40 @@
   background: #fff0df;
   border: 1px solid #c37920;
 }
+
+@media (max-width: 600px) {
+  .approval-card {
+    padding: 22px;
+  }
+  .approval-card table,
+  .approval-card tbody {
+    display: block;
+  }
+  .approval-card thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .approval-card tr {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-bottom: 16px;
+  }
+  .approval-card th,
+  .approval-card td {
+    display: block;
+  }
+  .approval-card td {
+    border-top: 0;
+  }
+  .approval-card td::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    color: #35684c;
+  }
+}
