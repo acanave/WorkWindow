@@ -52,3 +52,15 @@ A review link contains only `?approval=<UUID>`. With the feature flag off, the e
 Sign-in redirects retain only a validated proposal ID on the same app origin; configure and test the exact callback in an isolated Supabase environment before activation. A separate browser tab and unsynced edits still use existing revision-conflict protection. No broker token, task content or digest goes in the review URL. The test-only Vite config under this directory proxies to loopback PostgREST and is never used by the normal build/deployment.
 
 November 19 review-screen evidence: WorkWindow source `2e27e23` passed [application CI 44642095453](https://github.com/acanave/WorkWindow/actions/runs/44642095453): 72 unit tests, 5 existing browser tests, lint, formatting and build; secret scan also passed. The separate OpenClaw maintenance CI tested this exact source with its restricted client: 4 client checks, 22 API checks and 7 full browser/database scenarios passed, including lost-response recovery without a second task write. Desktop and mobile screenshots used fake tasks and were inspected. No deployment, hosted schema/auth change, real task or live assistant was involved. The feature remains off by default, branch auto-deployment remains disabled, and production magic-link/redirect acceptance and trusted runtime tool registration remain outstanding.
+
+## Local navigation fix during hosted acceptance
+
+The temporary hosted test revealed that ordinary page/calendar/board navigation
+called cloud saves and advanced the workspace revision without a task edit. The
+candidate now keeps view-only preferences in the device cache and skips unchanged
+content saves. Real task/project/draft changes still use the existing serialized
+save queue and revision conflict checks. Approval SQL and immutable proposal
+validation are unchanged. Navigation during an in-flight content save no longer
+leaves a false dirty state. Local lint, 74 unit tests and build passed; a real
+browser with intercepted synthetic API responses verified zero writes while
+switching views and reloading. Production app and OpenClaw remain unchanged.

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { mountWorkspace } from './controller'
 import template from './template.html?raw'
 import './workspace.css'
-import { emptyWorkspace, migrateWorkspace, exportWorkspace } from './model'
+import { emptyWorkspace, migrateWorkspace, exportWorkspace, sameWorkspaceContent, withLocalView } from './model'
 import { createSaveQueue, workspaceRepository } from './cloud'
 
 const storageKey = (id) => `workwindow:redesigned:${id || 'local'}`
@@ -40,12 +40,13 @@ export default function Workspace({ client = null, user = null, onSignOut }) {
         if (disposed) return
         revision = loaded.revision
         try {
-          if (!cached?.dirty) writeCache(id, { state: loaded.state, revision, dirty: false })
+          if (!cached?.dirty)
+            writeCache(id, { state: withLocalView(loaded.state, cached?.state), revision, dirty: false })
         } catch {
           /* cloud data stays authoritative */
         }
         const pending = !!cached?.dirty
-        const value = pending ? migrateWorkspace(cached.state) : loaded.state
+        const value = pending ? migrateWorkspace(cached.state) : withLocalView(loaded.state, cached?.state)
         latest.current = value
         dirty.current = pending
         setWorkspace(value)
@@ -56,7 +57,7 @@ export default function Workspace({ client = null, user = null, onSignOut }) {
             status: setStatus,
             saved(snapshot, newRevision) {
               revision = newRevision
-              dirty.current = JSON.stringify(latest.current) !== JSON.stringify(snapshot)
+              dirty.current = !sameWorkspaceContent(latest.current, snapshot)
               try {
                 writeCache(id, { state: latest.current, revision, dirty: dirty.current })
               } catch {
@@ -95,18 +96,19 @@ export default function Workspace({ client = null, user = null, onSignOut }) {
         if (!disposed && !dirty.current && revision === requestedRevision && remote.revision > revision) {
           queue.current?.stop()
           revision = remote.revision
-          latest.current = remote.state
+          const value = withLocalView(remote.state, latest.current)
+          latest.current = value
           try {
-            writeCache(id, { state: remote.state, revision, dirty: false })
+            writeCache(id, { state: value, revision, dirty: false })
           } catch {
             /* remote state is still available; the next edit reports storage errors */
           }
-          setWorkspace(remote.state)
+          setWorkspace(value)
           queue.current = createSaveQueue(repository, revision, {
             status: setStatus,
             saved(snapshot, newRevision) {
               revision = newRevision
-              dirty.current = JSON.stringify(latest.current) !== JSON.stringify(snapshot)
+              dirty.current = !sameWorkspaceContent(latest.current, snapshot)
               try {
                 writeCache(id, { state: latest.current, revision, dirty: dirty.current })
               } catch {
@@ -144,18 +146,19 @@ export default function Workspace({ client = null, user = null, onSignOut }) {
     if (!workspace || !host.current) return
     host.current.innerHTML = template
     const cleanup = mountWorkspace(host.current, workspace, (value) => {
+      const changed = !sameWorkspaceContent(latest.current, value)
       latest.current = value
-      dirty.current = !!client
+      dirty.current = dirty.current || (!!client && changed)
       try {
         const previous = readCache(id)
-        writeCache(id, { state: value, revision: previous?.revision || 0, dirty: !!client })
+        writeCache(id, { state: value, revision: previous?.revision || 0, dirty: dirty.current })
       } catch {
         dirty.current = true
         setStatus('storage-error')
         return
       }
-      if (client) queue.current?.push(value)
-      else setStatus('local')
+      if (client && changed) queue.current?.push(value)
+      else if (!client) setStatus('local')
     })
     return cleanup
   }, [workspace, client, id])
