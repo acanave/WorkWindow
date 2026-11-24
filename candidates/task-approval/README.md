@@ -19,6 +19,21 @@ The RPC arguments are `{action, body, token}`. Use POST JSON; never put a token 
 
 Preparation stores an immutable canonical proposal with exact project ID/title, task ID/source, operation, patch, before/after fields including defaults, workspace revision, expiry and SHA-256 digest. Only the stored ID+digest can be approved; no replacement patch or `approved` flag is accepted. The review screen must fetch this record using the owner's authenticated Supabase session, display it as text, and submit approval only on an explicit user click. The candidate now includes `src/approval/ApprovalScreen.jsx` behind `VITE_WORKWINDOW_APPROVALS=true`, which is unset by default. The matching inactive OpenClaw broker client lives in its own maintenance repository and exposes prepare/read only. No runtime tool is registered or activated. A GET cannot mutate via this volatile RPC.
 
+## Optional project planner
+
+Basic WorkWindow use and the task approval flow do not require
+`project-review.sql` or an assistant. Apply this separate migration only for
+an installation that opts into project planning. It uses the existing
+enabled, expiring broker grant to read a bounded summary of open tasks and
+bookings for the authorized project. It creates no grant, task or calendar
+entry. A compatible assistant handles suggestions and draft time blocks.
+
+The planner calls `POST /rest/v1/rpc/workwindow_project_review` with a broker
+token in the JSON body and an optional `review_day`. The public function runs
+as the caller. The privileged implementation is in `ww_approval`, which must
+stay outside the Data API's exposed schemas. The migration does not change
+the approval UI flag or grant direct access to workspace tables.
+
 ## Writes and retries
 
 The grant row and workspace are locked in one database transaction. The task update, revision increment and receipt commit atomically. Concurrent approvals and retries after a lost response return the same receipt. A unique owner/request key returns the same proposal for an identical preparation; different contents under the same key fail. Keep keys stable across retries. Never generate a new key automatically after an uncertain response. Semantic duplicates under deliberately different keys are not detected.

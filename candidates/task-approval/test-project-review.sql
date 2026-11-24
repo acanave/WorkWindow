@@ -1,5 +1,14 @@
 -- Disposable fixture only. run_agent_tasks.py --planner supplies the synthetic grant.
 begin;
+do $$ begin
+  assert not (select prosecdef from pg_proc where oid='public.workwindow_project_review(text,date)'::regprocedure),
+    'The public planner endpoint must run as the caller';
+  assert (select prosecdef from pg_proc where oid='ww_approval.review_project(text,date)'::regprocedure),
+    'Elevated workspace access belongs in the private schema';
+  assert not has_function_privilege('authenticated','public.workwindow_project_review(text,date)','EXECUTE');
+  assert not has_function_privilege('authenticated','ww_approval.review_project(text,date)','EXECUTE');
+  assert not has_table_privilege('anon','public.redesigned_workspaces','SELECT');
+end $$;
 update public.redesigned_workspaces set revision=revision+1,
   state = state || '{
     "projects":[{"id":"project-1","title":"Fake project"},{"id":"project-2","title":"Foreign project"}],
@@ -37,6 +46,14 @@ begin
   end;
 end;
 $$;
+set local "request.method" = 'GET';
+do $$ begin
+  perform public.workwindow_project_review('synthetic-broker-token-never-use-in-production');
+  raise exception 'unexpected success';
+exception when raise_exception then
+  if sqlerrm <> 'invalid_request' then raise; end if;
+end $$;
+set local "request.method" = 'POST';
 reset role;
 do $$ begin
   assert (select count(*) from ww_approval.proposals)=0;

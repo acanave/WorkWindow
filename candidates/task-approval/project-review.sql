@@ -1,6 +1,6 @@
--- Additive, on-request read for the existing single-project broker grant.
+-- Optional on-request read for the existing single-project broker grant.
 begin;
-create function public.workwindow_project_review(token text, review_day date default null)
+create function ww_approval.review_project(token text, review_day date)
 returns jsonb language plpgsql stable security definer set search_path = '' as $$
 declare
   g ww_approval.grant_config%rowtype;
@@ -107,6 +107,14 @@ begin
   return result;
 end;
 $$;
-revoke all on function public.workwindow_project_review(text,date) from public, authenticated;
+revoke all on function ww_approval.review_project(text,date) from public, anon, authenticated;
+-- Permit the invoker wrapper to delegate. Keep ww_approval outside the Data API's exposed schemas.
+grant execute on function ww_approval.review_project(text,date) to anon;
+
+create function public.workwindow_project_review(token text, review_day date default null)
+returns jsonb language sql stable security invoker set search_path = '' as $$
+  select ww_approval.review_project(token, review_day);
+$$;
+revoke all on function public.workwindow_project_review(text,date) from public, anon, authenticated;
 grant execute on function public.workwindow_project_review(text,date) to anon;
 commit;
