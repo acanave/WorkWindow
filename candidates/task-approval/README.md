@@ -1,6 +1,19 @@
-# Inactive task approval API
+# Assistant task approvals and project planning
 
-Candidate only. No hosted database migration, credential, grant, or deployment is created. The new owner review route is disabled by default. The `codex/task-approval-api` branch disables automatic Vercel deployment for that branch only. Existing app behavior and production source remain unchanged.
+The November 24 hosted release supports owner-reviewed task proposals for one authorized project. The assistant prepares a change, the owner signs in to review it, and approval saves the task and its receipt together. Self-hosted builds enable the review screen with `VITE_WORKWINDOW_APPROVALS=true` after configuring the approval integration. [Hosted release source](https://github.com/acanave/WorkWindow/commit/e458d627681058a7d1db8ca54cffeed9758f2494)
+
+## Optional read-only planner
+
+`project-review.sql` adds a separate project summary to an installation that already has `schema.sql`. The broker sends the grant token in the body of a POST request to `/rest/v1/rpc/workwindow_project_review`. Keep `ww_approval` outside the Data API’s exposed schemas. The public function runs with the caller’s privileges.
+
+For the requested Chicago date, the summary includes up to ten open tasks and twenty-four project bookings, with counts for omitted entries. A booked task retains its deadline, blocker and dependencies. Among otherwise actionable tasks, work whose window has opened ranks ahead of work with a future start. The planner reads workspace data. Drafting a schedule leaves calendar booking to the owner.
+
+The public database check installs the approval and planner schemas in disposable PostgreSQL and runs `test-project-review.sql` with fictional tasks. It covers project boundaries, read permissions, booking details and the ten-task cutoff. [Planner database check](https://github.com/acanave/WorkWindow/actions/runs/45495017414)
+
+<details>
+<summary>Original candidate design and November 19–20 verification notes</summary>
+
+The following notes describe the candidate before the November 24 hosted approval release.
 
 ## Small first version
 
@@ -79,3 +92,5 @@ validation are unchanged. Navigation during an in-flight content save no longer
 leaves a false dirty state. Local lint, 74 unit tests and build passed; a real
 browser with intercepted synthetic API responses verified zero writes while
 switching views and reloading. Production app and OpenClaw remain unchanged.
+
+</details>
