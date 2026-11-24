@@ -1,0 +1,137 @@
+.approval-page {
+  min-height: 100vh;
+  padding: 32px 16px;
+  background: #f2f5f3;
+  color: #172c25;
+}
+.approval-card {
+  max-width: 850px;
+  margin: auto;
+  padding: 28px;
+  border: 1px solid #ccd8d1;
+  border-radius: 16px;
+  background: white;
+}
+.approval-card h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.approval-card h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 24px 0 12px;
+}
+.approval-brand {
+  color: #35684c;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.approval-card p {
+  margin-bottom: 16px;
+}
+.approval-details {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) 3fr;
+  gap: 8px 16px;
+  margin-bottom: 24px;
+}
+.approval-details dt {
+  font-weight: 600;
+}
+.approval-details dd {
+  overflow-wrap: anywhere;
+}
+.approval-table-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+}
+.approval-card table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.approval-card caption {
+  text-align: left;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.approval-card th,
+.approval-card td {
+  padding: 12px;
+  border: 1px solid #ccd8d1;
+  text-align: left;
+  vertical-align: top;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.approval-card th {
+  background: #edf3ef;
+}
+.approval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.approval-actions button,
+.approval-actions a {
+  border: 1px solid #35684c;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.approval-actions button {
+  background: #24563d;
+  color: white;
+}
+.approval-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.approval-actions :focus-visible {
+  outline: 3px solid #b47500;
+  outline-offset: 3px;
+}
+.approval-card [role='alert'] {
+  padding: 12px;
+  background: #fff0df;
+  border: 1px solid #c37920;
+}
+
+@media (max-width: 600px) {
+  .approval-card {
+    padding: 22px;
+  }
+  .approval-card table,
+  .approval-card tbody {
+    display: block;
+  }
+  .approval-card thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .approval-card tr {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-bottom: 16px;
+  }
+  .approval-card th,
+  .approval-card td {
+    display: block;
+  }
+  .approval-card td {
+    border-top: 0;
+  }
+  .approval-card td::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    color: #35684c;
+  }
+}
