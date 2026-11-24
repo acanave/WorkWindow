@@ -39,18 +39,28 @@ begin
     raise exception 'project_not_unique';
   end if;
 
-  -- Mirror allTasks(): first representation wins, Done wins, metadata can reassign a card.
-  with cards as (
-    select distinct on (r->>'id') r->>'id' as id, r, src, w.state->'taskMeta'->(r->>'id') as meta
+  -- Keep the UI's card identity and project assignment. A booking's date
+  -- reserves time; its paired work item still owns the task's deadline and details.
+  with records as (
+    select r->>'id' as id, r, src, precedence, pos, w.state->'taskMeta'->(r->>'id') as meta
     from unnest(array['done','events','todos','notes','workItems']) with ordinality s(src, precedence)
-    cross join lateral jsonb_array_elements(w.state->src) with ordinality records(r, pos)
+    cross join lateral jsonb_array_elements(w.state->src) with ordinality rows_in_source(r, pos)
     where nullif(r->>'id','') is not null and (src <> 'notes' or r->>'type'='Task')
-    order by r->>'id', precedence, pos
+  ), cards as (
+    select distinct on (id) * from records order by id, precedence, pos
+  ), work_items as (
+    select distinct on (id) * from records where src='workItems' order by id, pos
   ), scoped as (
-    select id, src, r || coalesce(meta,'{}') as item, coalesce(r->>'title',r->>'text') as title,
-      case when src='done' then 'Done' else coalesce(nullif(meta->>'status','Done'),
-        case src when 'workItems' then r->>'status' when 'notes' then 'Backlog' else 'Ready' end) end as status
-    from cards where (case when meta ? 'project' then meta->>'project' else r->>'project' end)=project_name
+    select c.id, c.src,
+      (case when c.src='events' then c.r - 'date' else c.r end)
+        || coalesce(task.r,'{}'::jsonb) || coalesce(c.meta,'{}'::jsonb) as item,
+      coalesce(task.r->>'title', c.r->>'title', c.r->>'text') as title,
+      case when c.src='done' then 'Done' else coalesce(nullif(c.meta->>'status','Done'), task.r->>'status',
+        case c.src when 'workItems' then c.r->>'status' when 'notes' then 'Backlog' else 'Ready' end) end as status
+    from cards c
+    left join work_items task on task.id=c.id and c.src in ('events','todos')
+      and (case when task.meta ? 'project' then task.meta->>'project' else task.r->>'project' end)=project_name
+    where (case when c.meta ? 'project' then c.meta->>'project' else c.r->>'project' end)=project_name
   ), windows as (
     select win from jsonb_array_elements(w.state->'workWindows') win
   ), dependencies as (
@@ -61,11 +71,11 @@ begin
     select t.id, t.title, t.status, nullif(t.item->>'blocked','') as blocker,
       left(t.item->>'description',140) as description,
       case when t.src='todos' then coalesce(nullif(t.item->>'plannedFor',''),today::text) end as planned_for,
-      least(case when t.src <> 'events' then nullif(t.item->>'date','') end,
+      least(nullif(t.item->>'date',''),
         (select min(coalesce(nullif(win->>'due',''),win->>'end')) from windows
           where win->>'type'='task' and win->>'itemId'=t.id)) as due,
       (select min(win->>'start') from windows where win->>'type'='task' and win->>'itemId'=t.id
-        and win->>'end'>=day_requested::text) as next_window_start,
+        and coalesce(nullif(win->>'end',''),win->>'due')>=day_requested::text) as next_window_start,
       (select sum((win->>'effort')::numeric) from windows where win->>'type'='task'
         and win->>'itemId'=t.id and win->>'effort' ~ '^[0-9]{1,7}$') as effort,
       (select count(*) from dependencies d join scoped p on p.id=d.dependency
@@ -79,7 +89,7 @@ begin
     from scoped t where t.status is distinct from 'Done'
   ), ranked as (
     select *, row_number() over (order by (blocker is not null or waiting+unknown>0),
-      due nulls last, dependents desc, (status='In progress') desc nulls last, id) as n from tasks
+      coalesce(next_window_start > day_requested::text,false), due nulls last, dependents desc, (status='In progress') desc nulls last, id) as n from tasks
   ), bookings as (
     select e->>'start' as start_time,e->>'end' as end_time
     from jsonb_array_elements(w.state->'events') e join scoped t on t.id=e->>'id'
