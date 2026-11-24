@@ -2,11 +2,15 @@
 
 The November 24 hosted release supports owner-reviewed task proposals for one authorized project. The assistant prepares a change, the owner signs in to review it, and approval saves the task and its receipt together. Self-hosted builds enable the review screen with `VITE_WORKWINDOW_APPROVALS=true` after configuring the approval integration. [Hosted release source](https://github.com/acanave/WorkWindow/commit/e458d627681058a7d1db8ca54cffeed9758f2494)
 
+The owner verified task creation through Telegram and the hosted review screen. Update and retry behavior are covered by the [isolated approval checks](https://github.com/acanave/WorkWindow/actions/runs/44871924488).
+
 ## Optional read-only planner
 
 `project-review.sql` adds a separate project summary to an installation that already has `schema.sql`. The broker sends the grant token in the body of a POST request to `/rest/v1/rpc/workwindow_project_review`. Keep `ww_approval` outside the Data API’s exposed schemas. The public function runs with the caller’s privileges.
 
 For the requested Chicago date, the summary includes up to ten open tasks and twenty-four project bookings, with counts for omitted entries. A booked task retains its deadline, blocker and dependencies. Among otherwise actionable tasks, work whose window has opened ranks ahead of work with a future start. The planner reads workspace data. Drafting a schedule leaves calendar booking to the owner.
+
+On November 24, the owner verified that the hosted assistant could recommend a first step and draft a two-hour plan in Telegram. The exchange created no task proposals or approvals. [Planner implementation](https://github.com/acanave/WorkWindow/pull/16)
 
 The public database check installs the approval and planner schemas in disposable PostgreSQL and runs `test-project-review.sql` with fictional tasks. It covers project boundaries, read permissions, booking details and the ten-task cutoff. [Planner database check](https://github.com/acanave/WorkWindow/actions/runs/45495017414)
 

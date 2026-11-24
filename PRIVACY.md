@@ -12,6 +12,8 @@ The hosted application uses cloud sync. Browser storage is not a substitute for 
 
 Workspace content includes sticky notes, task/project titles and notes, reminders, dates, effort estimates, blockers, workflow state, and display preferences. Migrated workspaces retain original legacy records. Supabase handles the sign-in email and authentication session; hosting and authentication providers may retain operational logs under their own policies.
 
+If you use the optional Telegram planner, the configured assistant receives a summary of the authorized project. It can include task titles, short descriptions, deadlines, blockers, dependency information, and booked time ranges. Recommendations and draft schedules appear in the Telegram conversation. Drafting a schedule does not create calendar entries in WorkWindow.
+
 On deployments with assistant approvals enabled, a task request sent in Telegram passes through the configured assistant. WorkWindow stores the proposed change, including the project and task identifiers, the title and description under review, and the before-and-after values. Approving it also stores a receipt used to recognize retries. The ten-minute review window limits when you can approve. Proposal and receipt records can remain after that window. Workspace JSON exports cover workspace content and omit this separate approval history.
 
 The review link contains a proposal identifier. Opening it requires the owner’s signed-in WorkWindow account to see the proposal. Local-only use does not send tasks to Telegram.
