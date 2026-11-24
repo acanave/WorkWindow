@@ -1,32 +1,12 @@
 # WorkWindow
 
-WorkWindow shows how much time a task needs and where that time fits before its deadline. Capture a thought on the dashboard, give it a work window, and reserve a block on the calendar when you’re ready to do it.
+WorkWindow helps you make time for the work behind a deadline.
+
+For example, a volunteer schedule is due Friday and takes an hour to draft. Give it a **work window** from Tuesday through Friday and estimate one hour of effort. When you decide to do the work on Wednesday from 2 to 3 p.m., book that **time block** on the calendar. The Friday deadline stays in place.
 
 [Open WorkWindow](https://workwindow.vercel.app) · The hosted workspace requires an approved account. Run locally to explore an empty workspace without signing in.
 
 ![WorkWindow redesigned dashboard with fictional example data](docs/screenshots/dashboard-overview.png)
-
-## From Telegram to a reviewed task
-
-The hosted release supports an optional OpenClaw assistant connected to one authorized project. For example, in Telegram you might ask, “Add a task to draft the volunteer schedule.”
-
-1. The assistant prepares a proposal and sends a review link.
-2. Open the link and sign in to WorkWindow. The review screen shows the project, task, and exact before-and-after values.
-3. Choose **Approve exact changes** to add the task to Backlog, or **Cancel proposal** to leave the workspace as it is. WorkWindow saves the change and its receipt together, so retrying the same approval creates only one task.
-
-The assistant can also propose edits to the title or description of a supported unfinished task. Proposals expire after ten minutes. A workspace edit that changes the revision requires a fresh proposal. The local browser workspace works independently of Telegram.
-
-The November 24 release was verified with one owner-approved task creation. Update and retry behavior have separate automated coverage. [Approval release source](https://github.com/acanave/WorkWindow/commit/e458d627681058a7d1db8ca54cffeed9758f2494) · [Isolated approval checks](https://github.com/acanave/WorkWindow/actions/runs/44871924488)
-
-## Planning in Telegram · feature preview
-
-> “I have two hours this afternoon. What should I work on?”
-
-The optional planner reviews one authorized project’s open tasks, deadlines, blockers, dependencies, and booked time. Booking a task preserves its original deadline and prerequisites. When the planner selects up to ten tasks to return, actionable work whose window has opened comes before work with a future start.
-
-For example, suppose your outline is ready to start, the draft depends on it, and the project has a 1:30–2:00 check-in. If you’re free from 1:00 to 3:00, a suggested plan could use 1:00–1:30 for the outline, keep the check-in, and use 2:00–3:00 for the draft if the outline is finished. With only a duration, the assistant can suggest relative blocks and ask when you can start.
-
-Suggestions stay in chat until you choose what to book in WorkWindow. Conflict checks cover the selected project’s visible bookings. The planner API is available in source for configured integrations and has passed its fictional-data database tests. [Planner pull request](https://github.com/acanave/WorkWindow/pull/16) · [Database test results](https://github.com/acanave/WorkWindow/actions/runs/45495017414)
 
 ## One workspace, four views
 
@@ -37,11 +17,29 @@ Suggestions stay in chat until you choose what to book in WorkWindow. Conflict c
 | Boards    | Follow Backlog → Ready → In progress → Done with stacked project piles, shared project colors, and expandable task details. |
 | Projects  | Review the timetable, next action, progress, blockers, tasks, and saved project notes.                                      |
 
-A **WorkWindow** is a date range and estimated effort in hours. A **time block** reserves a specific start time and duration. Task details let you edit notes, blockers, dependencies, dates, and effort without leaving the board.
-
 ![WorkWindow redesigned boards with fictional example data](docs/screenshots/board-overview.png)
 
 Screenshots use fictional example projects and tasks. New workspaces contain no sample tasks or projects.
+
+## Optional Telegram assistant
+
+The hosted deployment includes an owner-only OpenClaw assistant for one authorized project. You can use all four WorkWindow views independently of Telegram.
+
+### Plan the next two hours
+
+> “I’m free from 1 to 3 this afternoon. What should I tackle first, and why? Draft time blocks around my project bookings.”
+
+The assistant reviews open tasks, deadlines, blockers, dependencies, and visible bookings for that project. It can suggest a first step and draft a schedule in chat. For example, if an outline is holding up a draft and there’s a project check-in at 1:30, it can suggest starting the outline before the check-in and continuing afterward. You choose which blocks to book in WorkWindow. Conflict checks cover only bookings returned for the selected project.
+
+### Propose a task change
+
+> “Add a task to draft the volunteer schedule.”
+
+The assistant sends a review link. Sign in to WorkWindow to see the project and the exact change. Choose **Approve exact changes** to create the Backlog task, or **Cancel proposal** to leave the task unchanged. You can also request title or description edits to a supported unfinished task.
+
+Proposals expire after ten minutes. If the workspace revision changes first, the assistant needs to prepare a fresh proposal. Approval saves the task change and its receipt together, so retrying the same approval applies the change once.
+
+See the [assistant integration guide](candidates/task-approval/README.md) for setup details, project limits, and verification.
 
 ## Run locally
 
