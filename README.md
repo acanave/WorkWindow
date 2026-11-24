@@ -1,12 +1,24 @@
 # WorkWindow
 
-**Capture a thought → choose today’s work → do it → feel finished.**
-
-WorkWindow brings quick capture, daily planning, Kanban boards, and projects into one browser workspace. A thought can stay a sticky note or become a task, reminder, or project immediately.
+WorkWindow shows how much time a task needs and where that time fits before its deadline. Capture a thought on the dashboard, give it a work window, and reserve a block on the calendar when you’re ready to do it.
 
 [Open WorkWindow](https://workwindow.vercel.app) · The hosted workspace requires an approved account. Run locally to explore an empty workspace without signing in.
 
 ![WorkWindow redesigned dashboard with fictional example data](docs/screenshots/dashboard-overview.png)
+
+## From Telegram to a reviewed task
+
+The hosted release supports an optional OpenClaw assistant connected to one authorized project. For example, in Telegram you might ask, “Add a task to draft the volunteer schedule.”
+
+1. The assistant prepares a proposal and sends a review link.
+2. Open the link and sign in to WorkWindow. The review screen shows the project, task, and exact before-and-after values.
+3. Choose **Approve exact changes** to add the task to Backlog, or **Cancel proposal** to leave the workspace as it is. WorkWindow saves the change and its receipt together, so retrying the same approval creates only one task.
+
+The assistant can also propose edits to the title or description of a supported unfinished task. Proposals expire after ten minutes. A workspace edit that changes the revision requires a fresh proposal. The local browser workspace works independently of Telegram.
+
+The November 24 release was verified with one owner-approved task creation. Update and retry behavior have separate automated coverage. [Approval release source](https://github.com/acanave/WorkWindow/commit/e458d627681058a7d1db8ca54cffeed9758f2494) · [Isolated approval checks](https://github.com/acanave/WorkWindow/actions/runs/44871924488)
+
+**In development — planning in Telegram.** “I have two hours this afternoon. What should I work on?” is the example behind a read-only project review. The prototype uses the selected project’s tasks, recorded dependencies, and bookings to suggest priorities and draft time blocks. The hosted approval release supports task proposals. Calendar booking still happens in WorkWindow.
 
 ## One workspace, four views
 
@@ -21,7 +33,7 @@ A **WorkWindow** is a date range and estimated effort in hours. A **time block**
 
 ![WorkWindow redesigned boards with fictional example data](docs/screenshots/board-overview.png)
 
-Screenshots use fictional fixtures isolated from production. New workspaces contain no sample tasks or projects.
+Screenshots use fictional example projects and tasks. New workspaces contain no sample tasks or projects.
 
 ## Run locally
 
@@ -44,7 +56,7 @@ For an authenticated deployment, follow [Cloud setup](docs/cloud-setup.md). The 
 - Export backup downloads workspace JSON. Treat exports as private; there is currently no redesigned import/restore interface.
 - Upgraded legacy cards retain their original records. Legacy effort points are preserved as context, not converted to hours.
 
-See [Privacy](PRIVACY.md) and [Security](SECURITY.md). Never put passwords, tokens, private exports, or server-side keys in this public repository. Vite environment variables are browser-visible; use only the Supabase URL and publishable key.
+See [Privacy](PRIVACY.md) and [Security](SECURITY.md). Never put passwords, tokens, private exports, or server-side keys in this public repository. Values exposed through `VITE_*` are visible in the browser. Use the Supabase URL and publishable key for client access. Keep assistant credentials server-side.
 
 ## Architecture
 
