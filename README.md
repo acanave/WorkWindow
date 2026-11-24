@@ -18,7 +18,15 @@ The assistant can also propose edits to the title or description of a supported 
 
 The November 24 release was verified with one owner-approved task creation. Update and retry behavior have separate automated coverage. [Approval release source](https://github.com/acanave/WorkWindow/commit/e458d627681058a7d1db8ca54cffeed9758f2494) · [Isolated approval checks](https://github.com/acanave/WorkWindow/actions/runs/44871924488)
 
-**In development — planning in Telegram.** “I have two hours this afternoon. What should I work on?” is the example behind a read-only project review. The prototype uses the selected project’s tasks, recorded dependencies, and bookings to suggest priorities and draft time blocks. The hosted approval release supports task proposals. Calendar booking still happens in WorkWindow.
+## Planning in Telegram · feature preview
+
+> “I have two hours this afternoon. What should I work on?”
+
+The optional planner reviews one authorized project’s open tasks, deadlines, blockers, dependencies, and booked time. Booking a task preserves its original deadline and prerequisites. When the planner selects up to ten tasks to return, actionable work whose window has opened comes before work with a future start.
+
+For example, suppose your outline is ready to start, the draft depends on it, and the project has a 1:30–2:00 check-in. If you’re free from 1:00 to 3:00, a suggested plan could use 1:00–1:30 for the outline, keep the check-in, and use 2:00–3:00 for the draft if the outline is finished. With only a duration, the assistant can suggest relative blocks and ask when you can start.
+
+Suggestions stay in chat until you choose what to book in WorkWindow. Conflict checks cover the selected project’s visible bookings. The planner is in review and has passed its fictional-data database tests. [Planner pull request](https://github.com/acanave/WorkWindow/pull/16) · [Database test results](https://github.com/acanave/WorkWindow/actions/runs/45495017414)
 
 ## One workspace, four views
 
