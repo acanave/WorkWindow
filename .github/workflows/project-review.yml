@@ -1,0 +1,58 @@
+name: Planner database tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'candidates/task-approval/**'
+      - 'docs/personal-access.sql'
+      - 'docs/redesigned-workspaces.sql'
+      - '.github/workflows/project-review.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'candidates/task-approval/**'
+      - 'docs/personal-access.sql'
+      - 'docs/redesigned-workspaces.sql'
+      - '.github/workflows/project-review.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  planner:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:17.6
+        env:
+          POSTGRES_PASSWORD: synthetic-ci-password
+          POSTGRES_DB: fake_workwindow
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+      PGPASSWORD: synthetic-ci-password
+      PGDATABASE: fake_workwindow
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install schemas in disposable PostgreSQL
+        run: |
+          psql -X -v ON_ERROR_STOP=1 \
+            -f candidates/task-approval/bootstrap-test.sql \
+            -f docs/personal-access.sql \
+            -f docs/redesigned-workspaces.sql \
+            -f candidates/task-approval/schema.sql \
+            -f candidates/task-approval/project-review.sql
+      - name: Run project review tests with the synthetic approval fixture
+        working-directory: candidates/task-approval
+        run: |
+          python3 -c 'from test_api import ApprovalAPI; ApprovalAPI().setUp()'
+          psql -X -v ON_ERROR_STOP=1 -f test-project-review.sql

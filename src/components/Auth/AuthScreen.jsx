@@ -26,7 +26,7 @@ function setStoredCooldownUntil(until) {
   }
 }
 
-export default function AuthScreen({ errorMessage }) {
+export default function AuthScreen({ errorMessage, approvalId }) {
   const [email, setEmail] = useState('')
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
@@ -83,7 +83,9 @@ export default function AuthScreen({ errorMessage }) {
       const { error } = await supabase.auth.signInWithOtp({
         email: normalizedEmail,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(approvalId || '')
+            ? `${window.location.origin}/?approval=${encodeURIComponent(approvalId)}`
+            : window.location.origin,
           shouldCreateUser: false,
         },
       })
