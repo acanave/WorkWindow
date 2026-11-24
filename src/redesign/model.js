@@ -76,3 +76,25 @@ export function exportWorkspace(state, filename = 'workwindow-backup.json') {
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
+
+// Navigation belongs to this device and must not invalidate task approvals.
+const viewKeys = [
+  'page',
+  'selected',
+  'showBacklog',
+  'cal',
+  'boardFilter',
+  'boardPiles',
+  'boardColumns',
+  'projectSelected',
+  'appearance',
+]
+export function sameWorkspaceContent(left, right) {
+  const content = (value) => Object.fromEntries(Object.entries(value || {}).filter(([key]) => !viewKeys.includes(key)))
+  return JSON.stringify(content(left)) === JSON.stringify(content(right))
+}
+export function withLocalView(state, local) {
+  const result = structuredClone(state)
+  for (const key of viewKeys) if (local && Object.hasOwn(local, key)) result[key] = structuredClone(local[key])
+  return result
+}
